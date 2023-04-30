@@ -9,11 +9,10 @@ int main(int argc, char *argv[])
     scanf("%d", &selection);
     switch (selection)
     {
+    /* From home directory and Selecting files according to Extension option */
     case 1:
-        Select_Files("/");
+        Select_Files("/home");
         Print_Success();
-    default:
-        printf("Not implemented...\n");
     }
     return 0;
 }

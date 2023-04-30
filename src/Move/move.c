@@ -4,37 +4,55 @@
 /* Gloabl Variable */
 static Node *Link_Arr[BUFSIZE]; /* Saving Node* variable to link*/
 static int idx = 0;             /* Link Arr Index */
+char slash[2] = "/";
 
+/* Selecting File or Directory [Recursive] */
 void Select_Files(char filename[])
 {
+    /* Variable */
     DIR *dir_ptr;
+    struct stat info;
     struct dirent *direntp;
     char path[256];
-    struct stat info;
+    char newpath[256];
+
+    /* Change the directory */
     if (chdir(filename) != 0)
     {
         perror(filename);
         exit(1);
     }
+
+    /* Get the Target Path  */
     getcwd(path, sizeof(path));
-    printf("path: %s\n", path);
+
+    /* Open directory and Finding process */
     if ((dir_ptr = opendir(path)) == NULL)
         fprintf(stderr, "Select_Files Func Error: cannot open %s\n", path);
     else
     {
         while ((direntp = readdir(dir_ptr)) != NULL)
         {
+            printf("%s\n", direntp->d_name);
+            /* directory name '.' and '..' is ignored */
             if (strcmp(direntp->d_name, ".") == 0 || strcmp(direntp->d_name, "..") == 0)
                 continue;
-            if (stat(direntp->d_name, &info))
+            if (stat(direntp->d_name, &info) == -1)
+                perror("stat error");
+            else
+            {
+                /* If File is directory, get Inside and search ( Recursive ) */
                 if (!Directory_check(&info))
                 {
-                    Ext_find(direntp->d_name, "c");
-                    Select_Files(direntp->d_name);
+                    strcpy(newpath, path);
+                    strcat(newpath, slash);
+                    strcat(newpath, direntp->d_name);
+                    Ext_find(newpath, "c");
                 }
-                /* Testing Finding the .c extension in File */
+                /* If not directory, checking Extension */
                 else
                     Ext_check(direntp->d_name, "c", &info);
+            }
         }
         closedir(dir_ptr);
     }
@@ -42,20 +60,36 @@ void Select_Files(char filename[])
 
 void Ext_find(char *dirpath, char *ext)
 {
+    /* Variable */
     DIR *dir_ptr;
     struct dirent *direntp;
     struct stat info;
+    char newpath[256];
+
     if ((dir_ptr = opendir(dirpath)) == NULL)
         fprintf(stderr, "cannot open current directory\n");
     else
     {
         while ((direntp = readdir(dir_ptr)) != NULL)
-            if (stat(dirpath, &info) == -1)
-                Ext_check(direntp->d_name, ext, &info);
+        {
+            if (strcmp(direntp->d_name, ".") == 0 || strcmp(direntp->d_name, "..") == 0)
+                continue;
+            strcpy(newpath, dirpath);
+            strcat(newpath, slash);
+            strcat(newpath, direntp->d_name);
+            if (stat(newpath, &info) == -1)
+                perror(dirpath);
+            else
+            {
+                if (!Directory_check(&info))
+                    Ext_find(newpath, ext);
+                else
+                    Ext_check(direntp->d_name, ext, &info);
+            }
+        }
         closedir(dir_ptr);
     }
 }
-
 void Ext_check(char *extname, char *ext, struct stat *info)
 {
     char ptr[BUFSIZE];
@@ -71,6 +105,8 @@ void Ext_check(char *extname, char *ext, struct stat *info)
             newnode->name = extname;
             newnode->ext = ext;
             newnode->atime = &info->st_atime;
+            printf("%s ", extname);
+            printf("%ln\n", &info->st_atime);
             Link_Arr[idx++] = newnode;
         }
     }
