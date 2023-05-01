@@ -12,11 +12,11 @@
 #include <grp.h>
 
 /* ls command and find the files according to conditions */
-void Select_Files(char filename[]);
+void Select_Files(char filename[], char *ext);
 
 /* Extension File Find */
 void Ext_find(char *dirpath, char *ext);
-void Ext_check(char *extname, char *ext, struct stat *info);
+void Ext_check(char filepath[], char *extname, char *ext, struct stat *info);
 
 /* Directory File Find */
 int Directory_check(struct stat *info_p);
