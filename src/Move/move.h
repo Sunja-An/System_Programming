@@ -6,13 +6,16 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <time.h>
 #include <dirent.h>
 #include <errno.h>
 #include <pwd.h>
 #include <grp.h>
 
 /* ls command and find the files according to conditions */
-void Select_Files(char filename[], char *ext);
+void Selecting_Files(char filename[], char* ext);
+void Selecting_Filename(char filename[], char *name);
+void Selecting_time_distance(char filename[],struct tm* st,struct tm* ed);
 
 /* Extension File Find */
 void Ext_find(char *dirpath, char *ext);
@@ -24,8 +27,9 @@ int Directory_check(struct stat *info_p);
 /* Remove Dirpath first character */
 void RemoveFirst(char *buf);
 
-/* Not maked
-void Mtime_find();
-void Name_find();
-void Find_print();
-*/
+void Name_find(char *dirpath, char *name);
+void Name_check(char* filepath, char* filename, char* name, struct stat *info);
+
+void Atime_find(char *dirpath, int st, int ed);
+void Atime_check(char *filepath, int st, int ed, struct stat* info);
+time_t MakeLocalTime_t(int YYYY, int MM, int DD);
