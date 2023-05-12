@@ -8,7 +8,5 @@
 typedef struct
 {
     char filepath[BUFSIZE]; /* Filepath Judge */
-    char *name;             /* File Name Judge */
-    char *ext;              /* File Extension Checking*/
     time_t atime;           /* Modified Time Judge */
 } Node;

@@ -2,12 +2,14 @@
 #include "../Struct/tree.h"
 
 /* Gloabl Variable */
-static Node *Link_Arr[BUFSIZE]; /* Saving Node* variable to link*/
-static int idx = 0;             /* Link Arr Index */
+extern Node *Link_Arr[BUFSIZE]; /* Saving Node* variable to link*/
+extern int idx;             /* Link Arr Index */
 char slash[2] = "/";
 
-void Selecting_Files(char filename[], char* ext)
+// Selecting_Name 이랑 엮어서 추출해내면 될듯
+void Selecting_Extension(char filename[], char *ext)
 {
+    memset(&idx, 0, sizeof(int));
     /* Variable */
     DIR *dir_ptr;
     struct stat info;
@@ -57,6 +59,7 @@ void Selecting_Files(char filename[], char* ext)
 
 void Selecting_Filename(char filename[], char *name)
 {
+    memset(&idx, 0, sizeof(int));
     /* Variable */
     DIR *dir_ptr;
     struct stat info;
@@ -88,7 +91,6 @@ void Selecting_Filename(char filename[], char *name)
                 perror("stat error");
             else
             {
-                
                 strcpy(newpath, path);
                 strcat(newpath, slash);
                 strcat(newpath, direntp->d_name);
@@ -106,16 +108,16 @@ void Selecting_Filename(char filename[], char *name)
 }
 
 /* Selecting File or Directory [Recursive] */
-void Selecting_time_distance(char filename[],struct tm* st,struct tm* ed)
+void Selecting_time_distance(char filename[], int st, int ed)
 {
+    memset(&idx, 0, sizeof(int));
     /* Variable */
     DIR *dir_ptr;
     struct stat info;
     struct dirent *direntp;
     char path[256];
     char newpath[256];
-    int st_time = MakeLocalTime_t(st->tm_year, st->tm_mon,st->tm_mday);
-    int ed_time = MakeLocalTime_t(ed->tm_year, ed->tm_mon, ed->tm_mday);
+
     /* Change the directory */
     if (chdir(filename) != 0)
     {
@@ -140,17 +142,16 @@ void Selecting_time_distance(char filename[],struct tm* st,struct tm* ed)
                 perror("stat error");
             else
             {
-                
                 strcpy(newpath, path);
                 strcat(newpath, slash);
                 strcat(newpath, direntp->d_name);
-
+                printf("%s\n",direntp->d_name);
                 /* If File is directory, get Inside and search ( Recursive ) */
                 if (!Directory_check(&info))
-                    Atime_find(newpath, st_time, ed_time);
+                    Atime_find(newpath, st, ed);
                 /* If not directory, checking Extension */
                 else
-                    Atime_check(newpath, st_time, ed_time, &info);
+                    Atime_check(newpath, st, ed, &info);
             }
         }
         closedir(dir_ptr);
@@ -213,33 +214,16 @@ void Ext_check(char filepath[], char *extname, char *ext, struct stat *info)
 
             /* Put in data to use list */
             strcpy(newnode->filepath, newfilepath);
-            newnode->name = extname;
-            newnode->ext = ext;
             newnode->atime = info->st_atime;
 
-            /**/
-
+            printf("%s\n",comp);
+            printf("filepath : %s\n", newnode->filepath);
+            fflush(stdout);
 
             /* Put in list */
             Link_Arr[idx++] = newnode;
         }
     }
-}
-
-int Directory_check(struct stat *info_p)
-{
-    if (S_ISDIR(info_p->st_mode))
-        return 0;
-    else
-        return -1;
-}
-
-void RemoveFirst(char *buf)
-{
-    int i;
-    for (i = 1; buf[i]; i++)
-        buf[i - 1] = buf[i];
-    buf[i - 1] = '\0';
 }
 
 // File find. Not directory
@@ -283,9 +267,8 @@ void Name_find(char *dirpath, char *name)
     }
 }
 
-void Name_check(char* filepath, char* filename, char* name, struct stat *info)
+void Name_check(char *filepath, char *filename, char *name, struct stat *info)
 {
-    char ptr[BUFSIZE];
     char newfilepath[256];
     if (name != NULL)
     {
@@ -298,18 +281,18 @@ void Name_check(char* filepath, char* filename, char* name, struct stat *info)
 
             /* Put in data to use list */
             strcpy(newnode->filepath, newfilepath);
-            printf("filename %s\n",filename);
-            newnode->name = filename;
-            newnode->ext = "TESTING";
             newnode->atime = info->st_atime;
 
+            printf("filepath : %s\n", newnode->filepath);
+            fflush(stdout);
             /* Put in list */
             Link_Arr[idx++] = newnode;
         }
     }
 }
 
-void Atime_find(char *dirpath, int st, int ed){
+void Atime_find(char *dirpath, int st, int ed)
+{
     /* Variable */
     DIR *dir_ptr;
     struct dirent *direntp;
@@ -348,7 +331,8 @@ void Atime_find(char *dirpath, int st, int ed){
     }
 }
 
-void Atime_check(char *filepath, int st, int ed, struct stat* info){
+void Atime_check(char *filepath, int st, int ed, struct stat *info)
+{
     char ptr[BUFSIZE];
     char newfilepath[256];
     if (st <= info->st_atime && ed >= info->st_atime)
@@ -360,25 +344,67 @@ void Atime_check(char *filepath, int st, int ed, struct stat* info){
 
         /* Put in data to use list */
         strcpy(newnode->filepath, newfilepath);
-        newnode->name = "TEST";
-        newnode->ext = "TESTING";
         newnode->atime = info->st_atime;
 
+        printf("filepath : %s\n", newnode->filepath);
+        fflush(stdout);
         /* Put in list */
         Link_Arr[idx++] = newnode;
     }
 }
 
-time_t MakeLocalTime_t(int YYYY, int MM, int DD)
+int Directory_check(struct stat *info_p)
 {
-	struct tm st_tm;
+    if (S_ISDIR(info_p->st_mode))
+        return 0;
+    else
+        return -1;
+}
 
-	st_tm.tm_year = YYYY - 1900;
-	st_tm.tm_mon =  MM - 1;
-	st_tm.tm_mday = DD; 
-	st_tm.tm_hour = 0; // default value
-	st_tm.tm_min =  0; // default value
-	st_tm.tm_sec =  0; // default value
+time_t MakeLocalTime_t(int YY, int MM, int DD)
+{
+    struct tm st_tm;
 
-	return mktime( &st_tm );
+    st_tm.tm_year = YY - 1900;
+    st_tm.tm_mon = MM - 1;
+    st_tm.tm_mday = DD;
+    st_tm.tm_hour = 0; // default value
+    st_tm.tm_min = 0;  // default value
+    st_tm.tm_sec = 0;  // default value
+
+    return mktime(&st_tm);
+}
+
+/*
+void Extract_Name(char* filepath){
+    char *prev;
+    char *ptr = strtok(filepath, "/");
+    
+    while(ptr!=NULL){
+        prev = ptr;
+        ptr=strtok(NULL,"/");
+    }
+
+    return prev;
+}
+
+void Extract_Extension(char* filepath){
+    char *prev;
+    char *ptr = strtok(filepath, ".");
+    
+    while(ptr!=NULL){
+        prev = ptr;
+        ptr = strtok(NULL,".");
+    }
+
+    return prev;
+}
+*/
+
+void RemoveFirst(char *buf)
+{
+    int i;
+    for (i = 1; buf[i]; i++)
+        buf[i - 1] = buf[i];
+    buf[i - 1] = '\0';
 }

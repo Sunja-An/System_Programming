@@ -13,7 +13,5 @@ void Print_Success()
     {
         printf("------------Selected Data Information---------------\n");
         printf("%s \n", Link_Arr[i]->filepath);
-        printf("%s \n", Link_Arr[i]->name);
-        printf("%s \n", Link_Arr[i]->ext);
     }
 }
