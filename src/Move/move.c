@@ -6,12 +6,12 @@ extern Node *Link_Arr[BUFSIZE]; /* Saving Node* variable to link*/
 extern int idx;                 /* Link Arr Index */
 char slash[2] = "/";
 
-void* Selecting_Filename(void* args)
+void *Selecting_Filename(void *args)
 {
-    MultipleArg *multiple_arg = (MultipleArg*)args;
-    
+    MultipleArg *multiple_arg = (MultipleArg *)args;
+
     memset(&idx, 0, sizeof(int));
-    
+
     /* Variable */
     DIR *dir_ptr;
     struct stat info;
@@ -36,13 +36,14 @@ void* Selecting_Filename(void* args)
     getcwd(path, sizeof(path));
 
     /* Open directory and Finding process */
-    if ((dir_ptr = opendir(path)) == NULL){
-        if(strstr(path, "CACHE") || strstr(path,"cache"))
+    if ((dir_ptr = opendir(path)) == NULL)
+    {
+        if (strstr(path, "CACHE") || strstr(path, "cache"))
             CACHE_FILE = ON;
-        if(strstr(path, "CONFIG") || strstr(path,"config") || strstr(path,"conf"))
+        if (strstr(path, "CONFIG") || strstr(path, "config") || strstr(path, "conf"))
             CONFIG_FILE = ON;
     }
-    //fprintf(stderr, "Selecting_Filename() : cannot open %s\n", path);
+    // fprintf(stderr, "Selecting_Filename() : cannot open %s\n", path);
     else
     {
         while ((direntp = readdir(dir_ptr)) != NULL)
@@ -147,8 +148,10 @@ void Name_check(char *filepath, char *filename, char *name, struct stat *info)
 }
 
 /* Selecting File or Directory [Recursive] */
-void Selecting_time_distance(char filename[], int st, int ed)
+void *Selecting_time_distance(void *args)
 {
+    MultipleArg *multiple_arg = (MultipleArg *)args;
+
     memset(&idx, 0, sizeof(int));
     /* Variable */
     DIR *dir_ptr;
@@ -156,6 +159,15 @@ void Selecting_time_distance(char filename[], int st, int ed)
     struct dirent *direntp;
     char path[256];
     char newpath[256];
+
+    char *filename;
+    int st;
+    int ed;
+
+    /* Variable Setting */
+    strcpy(filename, multiple_arg->filepath);
+    st = multiple_arg->start_time;
+    ed = multiple_arg->end_time;
 
     /* Change the directory */
     if (chdir(filename) != 0)
@@ -194,6 +206,7 @@ void Selecting_time_distance(char filename[], int st, int ed)
         }
         closedir(dir_ptr);
     }
+    return NULL;
 }
 
 void Atime_find(char *dirpath, int st, int ed)
@@ -214,6 +227,17 @@ void Atime_find(char *dirpath, int st, int ed)
         while ((direntp = readdir(dir_ptr)) != NULL)
         {
             if (strcmp(direntp->d_name, ".") == 0 || strcmp(direntp->d_name, "..") == 0)
+                continue;
+
+            if ((strstr(direntp->d_name, "config") != NULL) || (strstr(direntp->d_name, "conf") != NULL) || (strstr(dirpath, "CONFIG") != NULL) || (strstr(dirpath, "cf") != NULL))
+                continue;
+            if ((strstr(direntp->d_name, "cache") != NULL) || (strstr(direntp->d_name, "CACHE") != NULL))
+                continue;
+            if ((strstr(direntp->d_name, "package") != NULL))
+                continue;
+            if ((strstr(direntp->d_name, "data") != NULL) || (strstr(direntp->d_name, "User") != NULL))
+                continue;
+            if ((strstr(direntp->d_name, "extensions") != NULL))
                 continue;
 
             /* Stat by file to guess the Directory and check extension */
@@ -251,7 +275,6 @@ void Atime_check(char *filepath, int st, int ed, struct stat *info)
         strcpy(newnode->filepath, newfilepath);
         newnode->atime = info->st_atime;
 
-        printf("filepath : %s\n", newnode->filepath);
         fflush(stdout);
         /* Put in list */
         Link_Arr[idx++] = newnode;

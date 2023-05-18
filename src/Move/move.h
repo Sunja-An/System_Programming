@@ -22,12 +22,12 @@ char CONFIG_FILE;
 char CACHE_FILE;
 
 /* ls command and find the files according to conditions */
-void* Selecting_Filename(void* args);
+void *Selecting_Filename(void *args);
 void Name_find(char *dirpath, char *name);
 void Name_check(char *filepath, char *filename, char *name, struct stat *info);
 
 /* Time Distance Find */
-void Selecting_time_distance(char filename[], int st, int ed);
+void *Selecting_time_distance(void *args);
 void Atime_find(char *dirpath, int st, int ed);
 void Atime_check(char *filepath, int st, int ed, struct stat *info);
 

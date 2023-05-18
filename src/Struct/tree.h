@@ -15,4 +15,6 @@ typedef struct
 {
     char filepath[BUFSIZE];
     char option[BUFSIZE];
+    int start_time;
+    int end_time;
 } MultipleArg;

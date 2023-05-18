@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
     pid_t pid;
     pid_t pid_child;
     int status;
-    
+
     /* Thread variable */
     pthread_t first_take;
     pthread_t second_take;
@@ -61,6 +61,7 @@ int main(int argc, char *argv[])
         free(thr_ret);
 
         break;
+
     case 2:
         printf("Input Filename: ");
         scanf("%s", name);
@@ -82,6 +83,7 @@ int main(int argc, char *argv[])
         Print_Success();
         free(thr_ret);
         break;
+
     case 3:
         printf("--------------------\n");
         printf("Start Year : ");
@@ -97,21 +99,29 @@ int main(int argc, char *argv[])
         scanf("%d", &ed.tm_mon);
         printf("End Day : ");
         scanf("%d", &ed.tm_mday);
+
         st_time = MakeLocalTime_t(st.tm_year, st.tm_mon, st.tm_mday);
         ed_time = MakeLocalTime_t(ed.tm_year, ed.tm_mon, ed.tm_mday);
-        pid = fork();
-        if (pid < 0)
-            perror("fork error");
-        else if (pid == 0)
+
+        multiple_arg = (MultipleArg *)malloc(sizeof(MultipleArg));
+
+        strcpy(multiple_arg->filepath, "/home");
+        multiple_arg->start_time = st_time;
+        multiple_arg->end_time = ed_time;
+
+        if (pthread_create(&first_take, NULL, Selecting_time_distance, (void *)multiple_arg) != 0)
         {
-            Selecting_time_distance("/home", st_time, ed_time);
-            exit(0);
+            puts("pthread_create() error");
+            return -1;
         }
-        else
+        if (pthread_join(first_take, &thr_ret) != 0)
         {
-            pid_child = wait(&status);
-            Print_Success();
+            puts("pthread_join() error");
+            return -1;
         }
+
+        Print_Success();
+        free(thr_ret);
         break;
     default:
         printf("wrong value..\n");
