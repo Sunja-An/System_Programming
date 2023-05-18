@@ -3,19 +3,27 @@
 
 /* Gloabl Variable */
 extern Node *Link_Arr[BUFSIZE]; /* Saving Node* variable to link*/
-extern int idx;             /* Link Arr Index */
+extern int idx;                 /* Link Arr Index */
 char slash[2] = "/";
 
-// Selecting_Name 이랑 엮어서 추출해내면 될듯
-void Selecting_Extension(char filename[], char *ext)
+void* Selecting_Filename(void* args)
 {
+    MultipleArg *multiple_arg = (MultipleArg*)args;
+    
     memset(&idx, 0, sizeof(int));
+    
     /* Variable */
     DIR *dir_ptr;
     struct stat info;
     struct dirent *direntp;
+    char *filename;
+    char *name;
     char path[256];
     char newpath[256];
+
+    /* Variable Setting */
+    strcpy(filename, multiple_arg->filepath);
+    strcpy(name, multiple_arg->option);
 
     /* Change the directory */
     if (chdir(filename) != 0)
@@ -28,58 +36,13 @@ void Selecting_Extension(char filename[], char *ext)
     getcwd(path, sizeof(path));
 
     /* Open directory and Finding process */
-    if ((dir_ptr = opendir(path)) == NULL)
-        fprintf(stderr, "Select_Files Func Error: cannot open %s\n", path);
-    else
-    {
-        while ((direntp = readdir(dir_ptr)) != NULL)
-        {
-            /* directory name '.' and '..' is ignored */
-            if (strcmp(direntp->d_name, ".") == 0 || strcmp(direntp->d_name, "..") == 0)
-                continue;
-            if (stat(direntp->d_name, &info) == -1)
-                perror("stat error");
-            else
-            {
-                strcpy(newpath, path);
-                strcat(newpath, slash);
-                strcat(newpath, direntp->d_name);
-
-                /* If File is directory, get Inside and search ( Recursive ) */
-                if (!Directory_check(&info))
-                    Ext_find(newpath, ext);
-                /* If not directory, checking Extension */
-                else
-                    Ext_check(newpath, direntp->d_name, ext, &info);
-            }
-        }
-        closedir(dir_ptr);
+    if ((dir_ptr = opendir(path)) == NULL){
+        if(strstr(path, "CACHE") || strstr(path,"cache"))
+            CACHE_FILE = ON;
+        if(strstr(path, "CONFIG") || strstr(path,"config") || strstr(path,"conf"))
+            CONFIG_FILE = ON;
     }
-}
-
-void Selecting_Filename(char filename[], char *name)
-{
-    memset(&idx, 0, sizeof(int));
-    /* Variable */
-    DIR *dir_ptr;
-    struct stat info;
-    struct dirent *direntp;
-    char path[256];
-    char newpath[256];
-
-    /* Change the directory */
-    if (chdir(filename) != 0)
-    {
-        perror(filename);
-        exit(1);
-    }
-
-    /* Get the Target Path  */
-    getcwd(path, sizeof(path));
-
-    /* Open directory and Finding process */
-    if ((dir_ptr = opendir(path)) == NULL)
-        fprintf(stderr, "Select_Files Func Error: cannot open %s\n", path);
+    //fprintf(stderr, "Selecting_Filename() : cannot open %s\n", path);
     else
     {
         while ((direntp = readdir(dir_ptr)) != NULL)
@@ -104,6 +67,82 @@ void Selecting_Filename(char filename[], char *name)
             }
         }
         closedir(dir_ptr);
+    }
+    return NULL;
+}
+
+// File find. Not directory
+void Name_find(char *dirpath, char *name)
+{
+    /* Variable */
+    DIR *dir_ptr;
+    struct dirent *direntp;
+    struct stat info;
+    char newpath[256];
+
+    // printf("Error path: %s\n", dirpath);
+    // fprintf(stderr, "Extension find: cannot open current directory\n");
+
+    if ((dir_ptr = opendir(dirpath)) == NULL)
+    {
+        if ((strstr(dirpath, "config") != NULL) || (strstr(dirpath, "conf") != NULL) || (strstr(dirpath, "CONFIG") != NULL) || (strstr(dirpath, "cf") != NULL))
+            CONFIG_FILE = ON;
+        if ((strstr(dirpath, "cache") != NULL) || (strstr(dirpath, "CACHE") != NULL))
+            CACHE_FILE = ON;
+    }
+    else
+    {
+        while ((direntp = readdir(dir_ptr)) != NULL)
+        {
+            if (strcmp(direntp->d_name, ".") == 0 || strcmp(direntp->d_name, "..") == 0)
+                continue;
+            /* Stat by file to guess the Directory and check extension */
+            if ((strstr(direntp->d_name, "config") != NULL) || (strstr(direntp->d_name, "conf") != NULL) || (strstr(dirpath, "CONFIG") != NULL) || (strstr(dirpath, "cf") != NULL))
+                continue;
+            if ((strstr(direntp->d_name, "cache") != NULL) || (strstr(direntp->d_name, "CACHE") != NULL))
+                continue;
+            if ((strstr(direntp->d_name, "package") != NULL))
+                continue;
+            if ((strstr(direntp->d_name, "data") != NULL) || (strstr(direntp->d_name, "User") != NULL))
+                continue;
+            if ((strstr(direntp->d_name, "extensions") != NULL))
+                continue;
+            strcpy(newpath, dirpath);
+            strcat(newpath, slash);
+            strcat(newpath, direntp->d_name);
+            if (stat(newpath, &info) == -1)
+                perror(dirpath);
+            else
+            {
+                // Directory?
+                if (!Directory_check(&info))
+                    Name_find(newpath, name);
+                else
+                    Name_check(newpath, direntp->d_name, name, &info);
+            }
+        }
+        closedir(dir_ptr);
+    }
+}
+
+void Name_check(char *filepath, char *filename, char *name, struct stat *info)
+{
+    char newfilepath[256];
+    if (name != NULL)
+    {
+        if (strstr(filename, name) != NULL)
+        {
+            Node *newnode = (Node *)malloc(sizeof(Node));
+
+            /* File Path Take */
+            strcpy(newfilepath, filepath);
+            /* Put in data to use list */
+            strcpy(newnode->filepath, newfilepath);
+            newnode->atime = info->st_atime;
+            fflush(stdout);
+            /* Put in list */
+            Link_Arr[idx++] = newnode;
+        }
     }
 }
 
@@ -145,7 +184,6 @@ void Selecting_time_distance(char filename[], int st, int ed)
                 strcpy(newpath, path);
                 strcat(newpath, slash);
                 strcat(newpath, direntp->d_name);
-                printf("%s\n",direntp->d_name);
                 /* If File is directory, get Inside and search ( Recursive ) */
                 if (!Directory_check(&info))
                     Atime_find(newpath, st, ed);
@@ -155,139 +193,6 @@ void Selecting_time_distance(char filename[], int st, int ed)
             }
         }
         closedir(dir_ptr);
-    }
-}
-
-void Ext_find(char *dirpath, char *ext)
-{
-    /* Variable */
-    DIR *dir_ptr;
-    struct dirent *direntp;
-    struct stat info;
-    char newpath[256];
-    if ((dir_ptr = opendir(dirpath)) == NULL)
-    {
-        printf("Error path: %s\n", dirpath);
-        fprintf(stderr, "Extension find: cannot open current directory\n");
-    }
-    else
-    {
-        while ((direntp = readdir(dir_ptr)) != NULL)
-        {
-            if (strcmp(direntp->d_name, ".") == 0 || strcmp(direntp->d_name, "..") == 0)
-                continue;
-
-            /* Stat by file to guess the Directory and check extension */
-            strcpy(newpath, dirpath);
-            strcat(newpath, slash);
-            strcat(newpath, direntp->d_name);
-
-            if (stat(newpath, &info) == -1)
-                perror(dirpath);
-            else
-            {
-                if (!Directory_check(&info))
-                    Ext_find(newpath, ext);
-                else
-                    Ext_check(newpath, direntp->d_name, ext, &info);
-            }
-        }
-        closedir(dir_ptr);
-    }
-}
-
-void Ext_check(char filepath[], char *extname, char *ext, struct stat *info)
-{
-    char ptr[BUFSIZE];
-    char newfilepath[256];
-    strcpy(ptr, extname);
-    char *comp = strpbrk(ptr, ".");
-    if (comp != NULL)
-    {
-        RemoveFirst(comp);
-        if (strcmp(comp, ext) == 0)
-        {
-            Node *newnode = (Node *)malloc(sizeof(Node));
-
-            /* File Path Take */
-            strcpy(newfilepath, filepath);
-
-            /* Put in data to use list */
-            strcpy(newnode->filepath, newfilepath);
-            newnode->atime = info->st_atime;
-
-            printf("%s\n",comp);
-            printf("filepath : %s\n", newnode->filepath);
-            fflush(stdout);
-
-            /* Put in list */
-            Link_Arr[idx++] = newnode;
-        }
-    }
-}
-
-// File find. Not directory
-void Name_find(char *dirpath, char *name)
-{
-    /* Variable */
-    DIR *dir_ptr;
-    struct dirent *direntp;
-    struct stat info;
-    char newpath[256];
-
-    if ((dir_ptr = opendir(dirpath)) == NULL)
-    {
-        printf("Error path: %s\n", dirpath);
-        fprintf(stderr, "Extension find: cannot open current directory\n");
-    }
-    else
-    {
-        while ((direntp = readdir(dir_ptr)) != NULL)
-        {
-            if (strcmp(direntp->d_name, ".") == 0 || strcmp(direntp->d_name, "..") == 0)
-                continue;
-
-            /* Stat by file to guess the Directory and check extension */
-            strcpy(newpath, dirpath);
-            strcat(newpath, slash);
-            strcat(newpath, direntp->d_name);
-
-            if (stat(newpath, &info) == -1)
-                perror(dirpath);
-            else
-            {
-                // Directory?
-                if (!Directory_check(&info))
-                    Name_find(newpath, name);
-                else
-                    Name_check(newpath, direntp->d_name, name, &info);
-            }
-        }
-        closedir(dir_ptr);
-    }
-}
-
-void Name_check(char *filepath, char *filename, char *name, struct stat *info)
-{
-    char newfilepath[256];
-    if (name != NULL)
-    {
-        if (strstr(filename, name) != NULL)
-        {
-            Node *newnode = (Node *)malloc(sizeof(Node));
-
-            /* File Path Take */
-            strcpy(newfilepath, filepath);
-
-            /* Put in data to use list */
-            strcpy(newnode->filepath, newfilepath);
-            newnode->atime = info->st_atime;
-
-            printf("filepath : %s\n", newnode->filepath);
-            fflush(stdout);
-            /* Put in list */
-            Link_Arr[idx++] = newnode;
-        }
     }
 }
 
@@ -374,32 +279,6 @@ time_t MakeLocalTime_t(int YY, int MM, int DD)
 
     return mktime(&st_tm);
 }
-
-/*
-void Extract_Name(char* filepath){
-    char *prev;
-    char *ptr = strtok(filepath, "/");
-    
-    while(ptr!=NULL){
-        prev = ptr;
-        ptr=strtok(NULL,"/");
-    }
-
-    return prev;
-}
-
-void Extract_Extension(char* filepath){
-    char *prev;
-    char *ptr = strtok(filepath, ".");
-    
-    while(ptr!=NULL){
-        prev = ptr;
-        ptr = strtok(NULL,".");
-    }
-
-    return prev;
-}
-*/
 
 void RemoveFirst(char *buf)
 {

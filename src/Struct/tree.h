@@ -10,3 +10,9 @@ typedef struct
     char filepath[BUFSIZE]; /* Filepath Judge */
     time_t atime;           /* Modified Time Judge */
 } Node;
+
+typedef struct
+{
+    char filepath[BUFSIZE];
+    char option[BUFSIZE];
+} MultipleArg;
