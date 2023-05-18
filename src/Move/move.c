@@ -2,8 +2,8 @@
 #include "../Struct/tree.h"
 
 /* Gloabl Variable */
-extern Node *Link_Arr[BUFSIZE]; /* Saving Node* variable to link*/
-extern int idx;                 /* Link Arr Index */
+Node *Link_Arr[BUFSIZE];
+int idx;
 char slash[2] = "/";
 
 void *Selecting_Filename(void *args)

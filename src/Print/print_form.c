@@ -11,6 +11,8 @@ void Print_Success()
     printf("------------Selected Data Information---------------\n");
     for (int i = 0; i < idx; i++)
     {
+        if(Link_Arr[i] == NULL)
+            continue;
         printf("%s \n", Link_Arr[i]->filepath);
     }
 }

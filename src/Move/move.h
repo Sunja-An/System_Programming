@@ -39,3 +39,7 @@ time_t MakeLocalTime_t(int YY, int MM, int DD);
 
 /* Remove Dirpath first character */
 void RemoveFirst(char *buf);
+
+/* Collecting second & third */
+void *Loop_Filename(void *args);
+void *Loop_Distance(void *args);
