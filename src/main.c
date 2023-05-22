@@ -2,8 +2,8 @@
 #include "Struct/tree.h"
 #include "Print/print_form.h"
 
-extern Node *Link_Arr[BUFSIZE]; /* Saving Node* variable to link*/
-extern int idx;                 /* Link Arr Index */
+Node *Link_Arr[BUFSIZE];
+int idx;
 
 void menu(int selection);
 void sidemenu(int selection);
@@ -21,12 +21,13 @@ int main(int argc, char *argv[])
     scanf("%d", &selection);
     menu(selection);
 
-    while(1){
+    while (1)
+    {
         printf("\n\n\n--------------------------------------------------------\n");
         printf("Additional Select Block!\n");
         printf("Select what you want? (0: QUIT 1: extension 2: Filename 3: Time Distance): ");
         scanf("%d", &selection);
-        if(selection == 0)
+        if (selection == 0)
             break;
         else
             sidemenu(selection);
@@ -35,7 +36,8 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void menu(int selection){
+void menu(int selection)
+{
     /* Option Variable */
     char ext[BUFSIZE];
     char name[BUFSIZE];
@@ -48,22 +50,22 @@ void menu(int selection){
 
     /* Thread variable */
     pthread_t first_take;
-    
     MultipleArg *multiple_arg;
     void *thr_ret;
 
+    /* From home directory and Selecting files according to Extension option */
     switch (selection)
     {
-    /* From home directory and Selecting files according to Extension option */
     case 1:
         printf("Input Extension name: ");
         scanf("%s", ext);
 
+        /* Setting Thread Argument */
         multiple_arg = (MultipleArg *)malloc(sizeof(MultipleArg));
         strcpy(multiple_arg->filepath, "/home");
         strcpy(multiple_arg->option, ext);
 
-        if (pthread_create(&first_take, NULL, Selecting_Filename, (void *)multiple_arg) != 0)
+        if (pthread_create(&first_take, NULL, &Selecting_Filename, (void *)multiple_arg) != 0)
         {
             puts("pthread_create() error");
             exit(1);
@@ -76,18 +78,18 @@ void menu(int selection){
         }
 
         Print_Success();
-        free(thr_ret);
-
         break;
 
     case 2:
         printf("Input Filename: ");
         scanf("%s", name);
+
+        /* Setting Thread Argument */
         multiple_arg = (MultipleArg *)malloc(sizeof(MultipleArg));
         strcpy(multiple_arg->filepath, "/home");
         strcpy(multiple_arg->option, name);
 
-        if (pthread_create(&first_take, NULL, Selecting_Filename, (void *)multiple_arg) != 0)
+        if (pthread_create(&first_take, NULL, &Selecting_Filename, (void *)multiple_arg) != 0)
         {
             puts("pthread_create() error");
             exit(1);
@@ -98,10 +100,11 @@ void menu(int selection){
             exit(1);
         }
         Print_Success();
-        free(thr_ret);
         break;
 
     case 3:
+
+        /* Input Value Setting */
         printf("--------------------\n");
         printf("Start Year : ");
         scanf("%d", &st.tm_year);
@@ -120,39 +123,43 @@ void menu(int selection){
         st_time = MakeLocalTime_t(st.tm_year, st.tm_mon, st.tm_mday);
         ed_time = MakeLocalTime_t(ed.tm_year, ed.tm_mon, ed.tm_mday);
 
+        /* Setting Thread Argument */
         multiple_arg = (MultipleArg *)malloc(sizeof(MultipleArg));
-
         strcpy(multiple_arg->filepath, "/home");
         multiple_arg->start_time = st_time;
         multiple_arg->end_time = ed_time;
+        multiple_arg->idx = idx;
 
-        if (pthread_create(&first_take, NULL, Selecting_time_distance, (void *)multiple_arg) != 0)
+        /* Thread Control */
+        if (pthread_create(&first_take, NULL, &Selecting_time_distance, (void *)multiple_arg) != 0)
         {
             puts("pthread_create() error");
             exit(1);
         }
+
+        /* WAIT THREAD */
         if (pthread_join(first_take, &thr_ret) != 0)
         {
             puts("pthread_join() error");
             exit(1);
         }
 
+        /* Print_Success */
         Print_Success();
-        free(thr_ret);
         break;
     default:
         printf("wrong value..\n");
         printf("Try again!! :-)\n");
         break;
     }
-
 }
 
-void sidemenu(int selection){
+void sidemenu(int selection)
+{
     /* Option Variable */
     char ext[BUFSIZE];
     char name[BUFSIZE];
-    
+
     /* time distance variable */
     struct tm st;
     struct tm ed;
@@ -161,7 +168,6 @@ void sidemenu(int selection){
 
     /* Thread variable */
     pthread_t Multiple_take;
-    
     MultipleArg *multiple_arg;
     void *thr_ret;
     switch (selection)
@@ -172,8 +178,14 @@ void sidemenu(int selection){
         scanf("%s", ext);
 
         multiple_arg = (MultipleArg *)malloc(sizeof(MultipleArg));
+
+        // Initialize the allocated memory
+        memset(multiple_arg, 0, sizeof(MultipleArg));
+
         strcpy(multiple_arg->option, ext);
-        if (pthread_create(&Multiple_take, NULL, Loop_Filename, (void *)multiple_arg) != 0)
+        multiple_arg->idx = idx;
+
+        if (pthread_create(&Multiple_take, NULL, &Loop_Filename, (void *)multiple_arg) != 0)
         {
             puts("pthread_create() error");
             exit(1);
@@ -186,17 +198,17 @@ void sidemenu(int selection){
         }
 
         Print_Success();
-        free(thr_ret);
-
         break;
 
     case 2:
         printf("Input Filename: ");
         scanf("%s", name);
+
         multiple_arg = (MultipleArg *)malloc(sizeof(MultipleArg));
         strcpy(multiple_arg->option, name);
+        multiple_arg->idx = idx;
 
-        if (pthread_create(&Multiple_take, NULL, Loop_Filename, (void *)multiple_arg) != 0)
+        if (pthread_create(&Multiple_take, NULL, &Loop_Filename, (void *)multiple_arg) != 0)
         {
             puts("pthread_create() error");
             exit(1);
@@ -207,7 +219,6 @@ void sidemenu(int selection){
             exit(1);
         }
         Print_Success();
-        free(thr_ret);
         break;
 
     case 3:
@@ -233,8 +244,9 @@ void sidemenu(int selection){
 
         multiple_arg->start_time = st_time;
         multiple_arg->end_time = ed_time;
+        multiple_arg->idx = idx;
 
-        if (pthread_create(&Multiple_take, NULL, Loop_Distance, (void *)multiple_arg) != 0)
+        if (pthread_create(&Multiple_take, NULL, &Loop_Distance, (void *)multiple_arg) != 0)
         {
             puts("pthread_create() error");
             exit(1);
@@ -246,12 +258,10 @@ void sidemenu(int selection){
         }
 
         Print_Success();
-        free(thr_ret);
         break;
     default:
         printf("wrong value..\n");
         printf("Try again!! :-)\n");
         break;
     }
-
 }
