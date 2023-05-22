@@ -6,14 +6,14 @@ Node *Link_Arr[BUFSIZE];
 int idx;
 
 /* Not implemented */
-void Print_Success()
+void Print_Success(WINDOW *scr)
 {
     printf("------------Selected Data Information---------------\n");
     for (int i = 0; i < idx; i++)
     {
         if(Link_Arr[i] == NULL)
             continue;
-        printf("%s \n", Link_Arr[i]->filepath);
+        mvwprintw(scr,i,2,"[%d] %s", i+1, Link_Arr[i]->filepath);
     }
 }
 

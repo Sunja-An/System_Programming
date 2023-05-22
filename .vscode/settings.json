@@ -2,6 +2,7 @@
   "files.associations": {
     "stdio.h": "c",
     "stdlib.h": "c",
-    "tree.h": "c"
+    "tree.h": "c",
+    "ncurses.h": "c"
   }
 }
