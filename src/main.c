@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     initScreen();
     bkgd(COLOR_PAIR(1));
     menubar = subwin(stdscr, 1, 110, 0, 0);
-    exeScreen = subwin(stdscr, 30, 110, 0, 1);
+    exeScreen = subwin(stdscr, 30, 110, 0, 0);
     title(exeScreen);
     makeMenubar(menubar);
     refresh();
@@ -91,16 +91,18 @@ int main(int argc, char *argv[])
     }
     endwin();
 
-    /*while(1){
-        printf("\n\n\n--------------------------------------------------------\n");
-        printf("Additional Select Block!\n");
-        printf("Select what you want? (0: QUIT 1: extension 2: Filename 3: Time Distance): ");
-        scanf("%d", &selection);
-        if(selection == 0)
-            break;
-        else
-            sidemenu(selection);
-    }*/
+    // int selection;
+    // while (1)
+    // {
+    //     printf("\n\n\n--------------------------------------------------------\n");
+    //     printf("Additional Select Block!\n");
+    //     printf("Select what you want? (0: QUIT 1: extension 2: Filename 3: Time Distance): ");
+    //     scanf("%d", &selection);
+    //     if (selection == 0)
+    //         break;
+    //     else
+    //         sidemenu(selection);
+    // }
 
     return 0;
 }
@@ -143,7 +145,7 @@ void sidemenu(int selection)
             exit(1);
         }
 
-        Print_Success();
+        // Print_Success();
         free(thr_ret);
 
         break;
@@ -406,7 +408,8 @@ void credit(WINDOW *scr)
 void moveOpt1(WINDOW *scr)
 {
     /* Option Variable */
-    char ext[BUFSIZE];
+    char ext[BUFSIZE], tmp[BUFSIZE], *tok, *toktmp;
+    int input[BUFSIZE];
     /* Thread variable */
     pthread_t first_take;
     MultipleArg *multiple_arg;
@@ -417,7 +420,7 @@ void moveOpt1(WINDOW *scr)
     mvwprintw(scr, 2, 2, "----------------------------------------------------------------");
     mvwprintw(scr, 3, 2, " String that name include (for instance : .c, .java)");
     mvwprintw(scr, 4, 2, " String : ");
-    mvwscanw(scr, 4, 12, "%s", ext);
+    mvwscanw(scr, 4, 12, " %s", ext);
     mvwprintw(scr, 5, 2, "---------------------------------------------------------------");
 
     /* From home directory and Selecting files according to Extension option */
@@ -436,8 +439,27 @@ void moveOpt1(WINDOW *scr)
         puts("pthread_join() error");
         exit(1);
     }
-    werase(scr);
-    Print_Success(scr);
+
+    int pages = idx / 20;
+    int j = 0;
+    for (int i = 0; i < pages; i++)
+    {
+        Print_Success(scr, i);
+        memset(tmp, 0, sizeof(tmp));
+        mvwprintw(scr, 24, 2, "choose the index numbers, delimeter is \' \'(space)");
+        mvwscanw(scr, 25, 2, " %s", tmp);
+        tok = strtok(tmp, " ");
+        while (tok != NULL)
+        {
+            strcpy(toktmp, tok);
+            input[j] = atoi(toktmp) + i * 20;
+            tok = strtok(NULL, " ");
+            j++;
+        }
+        wprintw(scr, "\n%d", input[0]);
+    }
+    noecho();
+
     free(thr_ret);
 }
 void moveOpt2(WINDOW *scr)
@@ -459,7 +481,7 @@ void moveOpt2(WINDOW *scr)
     multiple_arg = (MultipleArg *)malloc(sizeof(MultipleArg));
     strcpy(multiple_arg->filepath, "/home");
     strcpy(multiple_arg->option, name);
-
+    noecho();
     if (pthread_create(&first_take, NULL, Selecting_Filename, (void *)multiple_arg) != 0)
     {
         puts("pthread_create() error");
@@ -471,7 +493,7 @@ void moveOpt2(WINDOW *scr)
         exit(1);
     }
     werase(scr);
-    Print_Success(scr);
+    Print_Success(scr, 1);
     free(thr_ret);
 }
 void moveOpt3(WINDOW *scr)
@@ -513,7 +535,7 @@ void moveOpt3(WINDOW *scr)
     strcpy(multiple_arg->filepath, "/home");
     multiple_arg->start_time = st_time;
     multiple_arg->end_time = ed_time;
-
+    noecho();
     if (pthread_create(&first_take, NULL, Selecting_time_distance, (void *)multiple_arg) != 0)
     {
         puts("pthread_create() error");
@@ -525,7 +547,7 @@ void moveOpt3(WINDOW *scr)
         exit(1);
     }
     werase(scr);
-    Print_Success(scr);
+    Print_Success(scr, 1);
     free(thr_ret);
 }
 
