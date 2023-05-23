@@ -1,19 +1,15 @@
 # FTM
----
 ## File Total Manager
----
 > 경북대학교 시스템 프로그래밍 ELEC462-002분반
 > 팀 프로젝트
 
 
 ### 팀 소개
----
 > 경북대학교 컴퓨터학부 글로벌SW융합학과 20학번 안선우 [@Sunja-An](https://github.com/Sunja-An)
 > 경북대학교 컴퓨터학부 심화컴퓨터전공 21학번 서동혁   [@eutopia115](https://github.com/eutopia115?tab=following)
-
+---
 
 ### 프로젝트 소개
----
 **Manage File in Linux**
 
 
@@ -31,7 +27,6 @@ We want to consumer that using this program feel 편리함과 간편함을 느�
 3. You can find files certain day to last day.
 
 ### 시작 가이드
----
 **Requirement**
 For building and running the application you need:
 
@@ -46,7 +41,6 @@ For building and running the application you need:
     ./FTM
 
 ###Stacks
----
 ####Environment
 
 
@@ -59,7 +53,6 @@ For building and running the application you need:
 
 
 ###주요 기능
----
 **리눅스의 파일들을 옵션에 맞춰 원하는 파일 탐색 가능**
 * Linux 내부에 있는 파일들을 Extension, Filename, Time Distance 옵션에 맞춰 파일을 가져올 수 있다.
 * 필요한 파일들만 선택을 해 Move, Backup 을 할 수 있다.
