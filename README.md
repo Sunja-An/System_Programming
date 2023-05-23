@@ -42,19 +42,20 @@ For building and running the application you need:
     cd src
     ./FTM
 
-###Stacks
-####Environment
+
+### Stacks
+#### Environment
 
 
-####Development
+#### Development
 
 
-####Communication
+#### Communication
 
 
 
 
-###주요 기능
+### 주요 기능
 **리눅스의 파일들을 옵션에 맞춰 원하는 파일 탐색 가능**
 * Linux 내부에 있는 파일들을 Extension, Filename, Time Distance 옵션에 맞춰 파일을 가져올 수 있다.
 * 필요한 파일들만 선택을 해 Move, Backup 을 할 수 있다.
