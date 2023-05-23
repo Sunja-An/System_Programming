@@ -10,7 +10,7 @@ extern char CONFIG_FILE;
 extern char CACHE_FILE;
 
 /* Not implemented */
-void Print_Success(WINDOW* scr)
+void Print_Success(WINDOW *scr)
 {
     printf("------------Selected Data Information---------------\n");
     scrollok(scr, TRUE);
