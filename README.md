@@ -6,6 +6,8 @@
 
 ### 팀 소개
 > 경북대학교 컴퓨터학부 글로벌SW융합학과 20학번 안선우 [@Sunja-An](https://github.com/Sunja-An)
+
+
 > 경북대학교 컴퓨터학부 심화컴퓨터전공 21학번 서동혁   [@eutopia115](https://github.com/eutopia115?tab=following)
 ---
 
