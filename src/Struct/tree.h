@@ -30,4 +30,3 @@ extern int idx;                 /* Link Arr Index */
 #define OFF 0
 
 /* Flag setting to filtering */
-
