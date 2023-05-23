@@ -313,7 +313,7 @@ void RemoveFirst(char *buf)
     buf[i - 1] = '\0';
 }
 
-void *Loop_Filename(void *args)
+static void *Loop_Filename(void *args)
 {
     MultipleArg *multiple_arg = (MultipleArg *)args;
     /* Variable */
@@ -340,7 +340,7 @@ void *Loop_Filename(void *args)
 }
 
 /* Selecting File or Directory [Recursive] */
-void *Loop_Distance(void *args)
+static void *Loop_Distance(void *args)
 {
     MultipleArg *multiple_arg = (MultipleArg *)args;
 
