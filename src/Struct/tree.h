@@ -1,3 +1,5 @@
+#pragma once
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,5 +30,3 @@ extern int idx;                 /* Link Arr Index */
 #define OFF 0
 
 /* Flag setting to filtering */
-char CONFIG_FILE;
-char CACHE_FILE;

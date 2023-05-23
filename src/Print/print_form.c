@@ -1,19 +1,24 @@
 #include "../Move/move.h"
 #include "../Struct/tree.h"
 #include "print_form.h"
+#include <ncurses.h>
 
 extern Node *Link_Arr[BUFSIZE];
 extern int idx;
 
+extern char CONFIG_FILE;
+extern char CACHE_FILE;
+
 /* Not implemented */
-void Print_Success()
+void Print_Success(WINDOW *scr)
 {
     printf("------------Selected Data Information---------------\n");
+    scrollok(scr, TRUE);
     for (int i = 0; i < idx; i++)
     {
         if (Link_Arr[i] == NULL)
             continue;
-        printf("%s \n", Link_Arr[i]->filepath);
+        printw("%s \n", Link_Arr[i]->filepath);
     }
 }
 

@@ -6,6 +6,9 @@ Node *Link_Arr[BUFSIZE];
 int idx;
 char slash[2] = "/";
 
+extern char CONFIG_FILE;
+extern char CACHE_FILE;
+
 void *Selecting_Filename(void *args)
 {
     MultipleArg *multiple_arg = (MultipleArg *)args;
