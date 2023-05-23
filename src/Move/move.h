@@ -5,6 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <ctype.h>
 #include <sys/types.h>
 #include <time.h>
 #include <dirent.h>
@@ -12,14 +13,6 @@
 #include <pwd.h>
 #include <grp.h>
 #include <pthread.h>
-
-/* Checking the flag  */
-#define ON 1
-#define OFF 0
-
-/* Flag setting to filtering */
-char CONFIG_FILE;
-char CACHE_FILE;
 
 /* ls command and find the files according to conditions */
 void *Selecting_Filename(void *args);

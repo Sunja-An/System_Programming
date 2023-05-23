@@ -1,3 +1,5 @@
+#pragma once
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,8 +15,19 @@ typedef struct
 
 typedef struct
 {
-    char filepath[BUFSIZE];
-    char option[BUFSIZE];
-    int start_time;
-    int end_time;
+    char filepath[BUFSIZE]; /* File path */
+    char option[BUFSIZE];   /* Option to find*/
+    int start_time;         /* Start Time of Sidstance */
+    int end_time;           /* End Time of Distance */
+    int idx;                /* List Index */
 } MultipleArg;
+
+extern Node *Link_Arr[BUFSIZE]; /* Saving Node* variable to link*/
+extern int idx;                 /* Link Arr Index */
+
+/* Checking the flag  */
+#define ON 1
+#define OFF 0
+
+/* Flag setting to filtering */
+

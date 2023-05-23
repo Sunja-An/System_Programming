@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     initScreen();
     bkgd(COLOR_PAIR(1));
     menubar = subwin(stdscr, 1, 110, 0, 0);
-    exeScreen = subwin(stdscr, 30, 110, 0, 0);
+    exeScreen = subwin(stdscr, 30, 110, 0, 1);
     title(exeScreen);
     makeMenubar(menubar);
     refresh();    
