@@ -17,3 +17,4 @@ move.o: Move/move.c Move/move.h
 
 clean:
 	$(RM) *.o
+	$(RM) FTM
