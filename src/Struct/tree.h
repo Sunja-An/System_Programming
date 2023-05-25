@@ -10,6 +10,8 @@
 typedef struct
 {
     char filepath[BUFSIZE]; /* Filepath Judge */
+    char *filename;
+    char *extension;
     time_t atime;           /* Modified Time Judge */
 } Node;
 
@@ -18,10 +20,7 @@ typedef struct
     //char filepath[BUFSIZE]; /* File path */
     //char option[BUFSIZE];   /* Option to find*/
     char *filepath;
-    char *option;
-    //char filepath[BUFSIZE]; /* File path */
-    //char option[BUFSIZE];   /* Option to find*/
-    char *filepath;
+    int select;
     char *option;
     int start_time;         /* Start Time of Sidstance */
     int end_time;           /* End Time of Distance */
@@ -37,3 +36,4 @@ extern int idx;                 /* Link Arr Index */
 
 extern char MOVE_FILE_PATH[BUFSIZE];
 extern char BACK_UP_PATH[BUFSIZE];
+
