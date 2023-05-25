@@ -40,6 +40,8 @@ For building and running the application you need:
 - Ubuntu 18.04.LTS
 - lpthread Package
 - lncurses Package
+
+
 **Required Package Installation**
 ##### lpthread
 
