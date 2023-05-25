@@ -13,6 +13,7 @@
 #include <pwd.h>
 #include <grp.h>
 #include <pthread.h>
+#include <ncurses.h>
 
 /* ls command and find the files according to conditions */
 void *Selecting_Filename(void *args);
@@ -36,3 +37,11 @@ void RemoveFirst(char *buf);
 /* Collecting second & third */
 void *Loop_Filename(void *args);
 void *Loop_Distance(void *args);
+
+/* Selected files to move and backup */
+int filecopy(const char *src, const char *dst);
+void back_up(int* arr);
+void moving(int* arr);
+
+/* String Setting */
+char* cutting_filename(char* filename);
