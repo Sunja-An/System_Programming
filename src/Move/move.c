@@ -9,6 +9,9 @@ char slash[2] = "/";
 extern char CONFIG_FILE;
 extern char CACHE_FILE;
 
+char MOVE_FILE_PATH[BUFSIZE];
+char BACK_UP_PATH[BUFSIZE];
+
 void *Selecting_Filename(void *args)
 {
     memset(&idx, 0, sizeof(int)); 
@@ -138,16 +141,33 @@ void Name_check(char *filepath, char *filename, char *name, int select,struct st
     {
         if (strstr(filename, name) != NULL)
         {
-            Node *newnode = (Node *)malloc(sizeof(Node));
-            /* File Path Take */
-            strcpy(newfilepath, filepath);
-            /* Put in data to use list */
-            strcpy(newnode->filepath, newfilepath);
-            newnode->filename = cutting_filename(newfilepath, select);
-            newnode->atime = info->st_atime;
-            fflush(stdout);
-            /* Put in list */
-            Link_Arr[idx++] = newnode;
+            if(select){
+                if(Discriminate_name(filename, name)){
+                    Node *newnode = (Node *)malloc(sizeof(Node));
+                    /* File Path Take */
+                    strcpy(newfilepath, filepath);
+                    /* Put in data to use list */
+                    strcpy(newnode->filepath, newfilepath);
+                    newnode->filename = cutting_filename(newfilepath);
+                    newnode->atime = info->st_atime;
+                    fflush(stdout);
+                    /* Put in list */
+                    Link_Arr[idx++] = newnode;
+                }
+            }else{
+                if(Discriminate_ext(filename, name)){
+                    Node *newnode = (Node *)malloc(sizeof(Node));
+                    /* File Path Take */
+                    strcpy(newfilepath, filepath);
+                    /* Put in data to use list */
+                    strcpy(newnode->filepath, newfilepath);
+                    newnode->filename = cutting_filename(newfilepath);
+                    newnode->atime = info->st_atime;
+                    fflush(stdout);
+                    /* Put in list */
+                    Link_Arr[idx++] = newnode;
+                }
+            }
         }
     }
 }
@@ -278,7 +298,7 @@ void Atime_check(char *filepath, int st, int ed, struct stat *info)
 
         /* Put in data to use list */
         strcpy(newnode->filepath, newfilepath);
-        newnode->filename = cutting_filename(newfilepath, 1);
+        newnode->filename = cutting_filename(newfilepath);
         newnode->atime = info->st_atime;
 
         fflush(stdout);
@@ -317,57 +337,6 @@ void RemoveFirst(char *buf)
     buf[i - 1] = '\0';
 }
 
-void *Loop_Filename(void *args)
-{
-    MultipleArg *multiple_arg = (MultipleArg *)args;
-    /* Variable */
-    char *name;
-    int i = 0;
-
-    memset(name, 0, sizeof(name));
-    strcpy(name, multiple_arg->option);
-
-    if (name == NULL)
-    {
-        fprintf(stderr, "No Input value to find file");
-    }
-    while (i < idx)
-    {
-        printf("Link_Arr[i] : %s\n", Link_Arr[i++]->filepath);
-        if (strstr(Link_Arr[i++]->filepath, name) == NULL)
-        {
-            free(Link_Arr[i - 1]);
-            Link_Arr[i - 1] = NULL;
-        }
-    }
-    return NULL;
-}
-
-/* Selecting File or Directory [Recursive] */
-void *Loop_Distance(void *args)
-{
-    MultipleArg *multiple_arg = (MultipleArg *)args;
-
-    /* Variable */
-    int i = 0;
-    int st;
-    int ed;
-
-    /* Variable Setting */
-    st = multiple_arg->start_time;
-    ed = multiple_arg->end_time;
-    while (i < idx)
-    {
-        if (Link_Arr[i]->atime < st || Link_Arr[i++]->atime > ed)
-        {
-            free(Link_Arr[i - 1]);
-            Link_Arr[i - 1] = NULL;
-        }
-    }
-
-    return NULL;
-}
-
 int filecopy(const char *src, const char *dst){
     FILE *fsrc, *fdst;
     char buf[BUFSIZE];
@@ -394,19 +363,25 @@ int filecopy(const char *src, const char *dst){
 
 void moving(int* arr, int num){
     int i = 0;
+    char* name;
+    char path[BUFSIZE];
     while(i< num){
-        rename(Link_Arr[arr[i++]]->filepath, MOVE_FILE_PATH);
+        name = cutting_filename(Link_Arr[arr[i]]->filepath);
+        strcpy(path, MOVE_FILE_PATH);
+        strcat(path, slash);
+        strcat(path, name);
+        rename(Link_Arr[arr[i++]]->filepath, path);
     }
 }
 
 void back_up(int* arr, int num){
     int i = 0;
-    char* BACK_UP = "";
-    strcat(BACK_UP, BACK_UP_PATH);
+    char BACK_UP[BUFSIZE];
     while(i<num){
         /* Back up file path setting */
+        strcpy(BACK_UP, BACK_UP_PATH);
         strcat(BACK_UP, slash);
-        strcat(BACK_UP, cutting_filename(Link_Arr[arr[i]]->filepath,1));
+        strcat(BACK_UP, cutting_filename(Link_Arr[arr[i]]->filepath));
 
         /* File Copy */
         switch(filecopy(Link_Arr[arr[i++]]->filepath, BACK_UP)){
@@ -425,25 +400,49 @@ void back_up(int* arr, int num){
 }
 
 /* Cutting filepath to extract filename and file's extension */
-char* cutting_filename(char* filepath, int flag){
+char* cutting_filename(char* filepath){
     char* token;
     char* prev;
 
-    /* Flag ON is extracting filename */
-    /* FLAG OFF is extracting extension */
-    if(flag){
-        token = strtok(filepath, "/");
-        while(token != NULL){
-            prev = token;
-            token = strtok(NULL,"/");
-        }
-    } 
-    else{
-        token = strtok(filepath, ".");
-        while(token != NULL){
-            prev = token;
-            token = strtok(NULL,".");
-        }
+    token = strtok(filepath, "/");
+    while(token != NULL){
+        prev = token;
+        token = strtok(NULL,"/");
     }
+    
     return prev;
+}
+
+bool Discriminate_name(char filepath[], char* name){
+    char copypath[BUFSIZE];
+    char* token;
+    char* prev;
+    strcpy(copypath, filepath);
+
+    token = strtok(copypath, "/");
+    while(token != NULL){
+        prev = token;
+        token = strtok(NULL,"/");
+    }
+    if(prev != NULL && !strcmp(prev, name)){
+        return true;
+    }
+    return false;
+}
+
+bool Discriminate_ext(char filepath[], char* ext){
+    char copypath[BUFSIZE];
+    char* token;
+    char* prev;
+    strcpy(copypath, filepath);
+        
+    token = strtok(copypath, ".");
+    while(token != NULL){
+        prev = token;
+        token = strtok(NULL,".");
+    }
+    if(prev != NULL && !strcmp(prev, ext)){
+        return true;
+    }
+    return false;
 }
