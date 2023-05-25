@@ -11,23 +11,21 @@ extern char CACHE_FILE;
 
 void *Selecting_Filename(void *args)
 {
+    memset(&idx, 0, sizeof(int)); 
     MultipleArg *multiple_arg = (MultipleArg*)args;
-    memset(&idx, 0, sizeof(int));
 
     /* Variable */
     DIR *dir_ptr;
     struct stat info;
     struct dirent *direntp;
-    char filename[BUFSIZE];
-    char name[BUFSIZE];
+    char *filename;
+    char *name;
     char path[256];
     char newpath[256];
 
     /* Variable Setting */
-    //filename = strdup(multiple_arg->filepath);
-    //name = strdup(multiple_arg->option);
-    strcpy(filename, multiple_arg->filepath);
-    strcpy(name, multiple_arg->option);
+    filename = multiple_arg->filepath;
+    name = multiple_arg->option;
 
     /* Change the directory */
     if (chdir(filename) != 0)
@@ -138,11 +136,11 @@ void Name_check(char *filepath, char *filename, char *name, struct stat *info)
         if (strstr(filename, name) != NULL)
         {
             Node *newnode = (Node *)malloc(sizeof(Node));
-
             /* File Path Take */
             strcpy(newfilepath, filepath);
             /* Put in data to use list */
             strcpy(newnode->filepath, newfilepath);
+            newnode->filename = cutting_filename(newfilepath,1);
             newnode->atime = info->st_atime;
             fflush(stdout);
             /* Put in list */
@@ -406,7 +404,7 @@ void back_up(int* arr){
     while(i<sz){
         /* Back up file path setting */
         strcat(BACK_UP, slash);
-        strcat(BACK_UP, cutting_filename(Link_Arr[arr[i]]->filepath));
+        strcat(BACK_UP, cutting_filename(Link_Arr[arr[i]]->filepath,1));
 
         /* File Copy */
         switch(filecopy(Link_Arr[arr[i++]]->filepath, BACK_UP)){
@@ -424,14 +422,26 @@ void back_up(int* arr){
     }
 }
 
-char* cutting_filename(char* filename){
+/* Cutting filepath to extract filename and file's extension */
+char* cutting_filename(char* filepath, int flag){
     char* token;
     char* prev;
-    token = strtok(filename, "/");
-    
-    while(token != NULL){
-        prev = token;
-        token = strtok(NULL,"/");
+
+    /* Flag ON is extracting filename */
+    /* FLAG OFF is extracting extension */
+    if(flag){
+        token = strtok(filepath, "/");
+        while(token != NULL){
+            prev = token;
+            token = strtok(NULL,"/");
+        }
+    } 
+    else{
+        token = strtok(filepath, ".");
+        while(token != NULL){
+            prev = token;
+            token = strtok(NULL,".");
+        }
     }
     return prev;
 }
