@@ -34,14 +34,12 @@ time_t MakeLocalTime_t(int YY, int MM, int DD);
 /* Remove Dirpath first character */
 void RemoveFirst(char *buf);
 
-/* Collecting second & third */
-void *Loop_Filename(void *args);
-void *Loop_Distance(void *args);
-
 /* Selected files to move and backup */
 int filecopy(const char *src, const char *dst);
 void moving(int* arr, int num);
 void back_up(int* arr, int num);
 
 /* String Setting */
-char* cutting_filename(char* filepath, int flag);
+char* cutting_filename(char* filepath);
+bool Discriminate_name(char filepath[], char* name);
+bool Discriminate_ext(char filepath[], char* ext);
