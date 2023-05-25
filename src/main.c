@@ -8,8 +8,9 @@ extern int idx;                 /* Link Arr Index */
 char CONFIG_FILE;
 char CACHE_FILE;
 int FORM = 0;
-char MOVE_FILE_PATH[BUFSIZE];
-char BACK_UP_PATH[BUFSIZE];
+
+extern char MOVE_FILE_PATH[BUFSIZE];
+extern char BACK_UP_PATH[BUFSIZE];
 
 void menu(int selection);
 void sidemenu(int selection);
@@ -19,6 +20,8 @@ int main(int argc, char *argv[])
     /* init program */
     CACHE_FILE = OFF;
     CONFIG_FILE = OFF;
+    strcpy(MOVE_FILE_PATH, "/home");
+    strcpy(BACK_UP_PATH, "/home");
 
     WINDOW *menubar, *exeScreen, *about;
     int key, status;
@@ -73,19 +76,6 @@ int main(int argc, char *argv[])
         refresh();
     }
     endwin();
-
-    // int selection;
-    // while (1)
-    // {
-    //     printf("\n\n\n--------------------------------------------------------\n");
-    //     printf("Additional Select Block!\n");
-    //     printf("Select what you want? (0: QUIT 1: extension 2: Filename 3: Time Distance): ");
-    //     scanf("%d", &selection);
-    //     if (selection == 0)
-    //         break;
-    //     else
-    //         sidemenu(selection);
-    // }
 
     return 0;
 }
@@ -334,8 +324,7 @@ void moveOpt1(WINDOW *scr)
     /* From home directory and Selecting files according to Extension option */
     multiple_arg.filepath = "/home";
     multiple_arg.option = ext;
-    //strcpy(multiple_arg->filepath, "/home");
-    //strcpy(multiple_arg->option, ext);
+    multiple_arg.select = 0;
 
     if (pthread_create(&first_take, NULL, Selecting_Filename, (void *)&multiple_arg) != 0)
     {
@@ -374,6 +363,8 @@ void moveOpt2(WINDOW *scr)
 
     multiple_arg.filepath = "/home";
     multiple_arg.option = name;
+    multiple_arg.select = 1;
+
     if (pthread_create(&first_take, NULL, Selecting_Filename, (void *)&multiple_arg) != 0)
     {
         puts("pthread_create() error");
@@ -399,7 +390,7 @@ void moveOpt3(WINDOW *scr)
 
     /* Thread variable */
     pthread_t first_take;
-    MultipleArg *multiple_arg;
+    MultipleArg multiple_arg;
     void *thr_ret;
     echo();
     werase(scr);
@@ -423,13 +414,14 @@ void moveOpt3(WINDOW *scr)
     mvwprintw(scr, 12, 2, "---------------------------------------------------------------");
     st_time = MakeLocalTime_t(st.tm_year, st.tm_mon, st.tm_mday);
     ed_time = MakeLocalTime_t(ed.tm_year, ed.tm_mon, ed.tm_mday);
+    
+    multiple_arg.filepath = "/home";
+    multiple_arg.start_time = st_time;
+    multiple_arg.end_time = ed_time;
 
-    multiple_arg = (MultipleArg *)malloc(sizeof(MultipleArg));
-    strcpy(multiple_arg->filepath, "/home");
-    multiple_arg->start_time = st_time;
-    multiple_arg->end_time = ed_time;
     noecho();
-    if (pthread_create(&first_take, NULL, Selecting_time_distance, (void *)multiple_arg) != 0)
+
+    if (pthread_create(&first_take, NULL, Selecting_time_distance, (void *)&multiple_arg) != 0)
     {
         puts("pthread_create() error");
         exit(1);
@@ -471,6 +463,7 @@ void copyOpt1(WINDOW *scr)
     start = MakeLocalTime_t(xYear, xMon, xDate);
     end = MakeLocalTime_t(yYear, yMon, yDate);
 }
+
 void copyOpt2(WINDOW *scr)
 {
     char *str;
@@ -482,8 +475,9 @@ void copyOpt2(WINDOW *scr)
     mvwprintw(scr, 4, 2, " String : ");
     mvwscanw(scr, 4, 12, "%s", str);
     mvwprintw(scr, 5, 2, "---------------------------------------------------------------");
-    Name_find(".", str);
+    Name_find(".", str, 1);
 }
+
 void copyOpt3(WINDOW *scr)
 {
     int xYear, xMon, xDate, yYear, yMon, yDate;
@@ -549,6 +543,7 @@ void con_savepath(WINDOW *scr){
     noecho();
     wrefresh(scr);
 }
+
 void con_printpath(WINDOW *scr){
     int opt;
     werase(scr);
@@ -570,6 +565,7 @@ void con_printpath(WINDOW *scr){
     }
     wrefresh(scr);
 }
+
 void colorset(WINDOW *scr){
     int opt;
     char charopt[1];
