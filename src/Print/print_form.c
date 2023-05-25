@@ -3,6 +3,8 @@
 #include "print_form.h"
 #include <ncurses.h>
 
+#define CUT "---------------------------------------------------------------------------------------------------------------------"
+
 extern Node *Link_Arr[BUFSIZE];
 extern int idx;
 
@@ -10,16 +12,17 @@ extern char CONFIG_FILE;
 extern char CACHE_FILE;
 
 /* Not implemented */
-void Print_Success(WINDOW *scr)
+void Print_Success(WINDOW *scr, int page)
 {
-    printf("------------Selected Data Information---------------\n");
+    mvwprintw(scr, 1, 2,"[Page %d]%s", page, CUT);
     scrollok(scr, TRUE);
-    for (int i = 0; i < idx; i++)
+    for (int i = 0; i < 20; i++)
     {
-        if (Link_Arr[i] == NULL)
+        if (Link_Arr[i+page*20] == NULL)
             continue;
-        printw("%s \n", Link_Arr[i]->filepath);
+        mvwprintw(scr, i+2, 2, "%d %s \n", i+1, Link_Arr[i+page*20]->filepath);
     }
+    mvwprintw(scr, 23, 2,"%s[Page %d]", CUT, page);
 }
 
 void Print_Failed()

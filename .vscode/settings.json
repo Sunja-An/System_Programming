@@ -3,6 +3,17 @@
     "stdio.h": "c",
     "stdlib.h": "c",
     "tree.h": "c",
-    "ncurses.h": "c"
+    "ncurses.h": "c",
+    "dirent.h": "c",
+    "ctype.h": "c",
+    "errno.h": "c",
+    "grp.h": "c",
+    "pthread.h": "c",
+    "time.h": "c",
+    "stat.h": "c",
+    "unistd.h": "c",
+    "string.h": "c",
+    "pwd.h": "c",
+    "types.h": "c"
   }
 }

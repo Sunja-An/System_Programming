@@ -29,6 +29,8 @@ extern Node *Link_Arr[BUFSIZE]; /* Saving Node* variable to link*/
 extern int idx;                 /* Link Arr Index */
 char CONFIG_FILE;
 char CACHE_FILE;
+char MOVE_FILE_PATH[BUFSIZE];
+char BACK_UP_PATH[BUFSIZE];
 
 void menu(int selection);
 void sidemenu(int selection);
@@ -43,8 +45,8 @@ int main(int argc, char *argv[])
     int key, status;
     initScreen();
     bkgd(COLOR_PAIR(1));
-    menubar = subwin(stdscr, 1, 110, 0, 0);
-    exeScreen = subwin(stdscr, 30, 110, 0, 1);
+    menubar = subwin(stdscr, 1, 130, 0, 0);
+    exeScreen = subwin(stdscr, 30, 130, 1, 0);
     title(exeScreen);
     makeMenubar(menubar);
     refresh();
@@ -91,126 +93,20 @@ int main(int argc, char *argv[])
     }
     endwin();
 
-    /*while(1){
-        printf("\n\n\n--------------------------------------------------------\n");
-        printf("Additional Select Block!\n");
-        printf("Select what you want? (0: QUIT 1: extension 2: Filename 3: Time Distance): ");
-        scanf("%d", &selection);
-        if(selection == 0)
-            break;
-        else
-            sidemenu(selection);
-    }*/
+    // int selection;
+    // while (1)
+    // {
+    //     printf("\n\n\n--------------------------------------------------------\n");
+    //     printf("Additional Select Block!\n");
+    //     printf("Select what you want? (0: QUIT 1: extension 2: Filename 3: Time Distance): ");
+    //     scanf("%d", &selection);
+    //     if (selection == 0)
+    //         break;
+    //     else
+    //         sidemenu(selection);
+    // }
 
     return 0;
-}
-
-void sidemenu(int selection)
-{
-    /* Option Variable */
-    char ext[BUFSIZE];
-    char name[BUFSIZE];
-
-    /* time distance variable */
-    struct tm st;
-    struct tm ed;
-    int st_time;
-    int ed_time;
-
-    /* Thread variable */
-    pthread_t Multiple_take;
-
-    MultipleArg *multiple_arg;
-    void *thr_ret;
-    switch (selection)
-    {
-    /* From home directory and Selecting files according to Extension option */
-    case 1:
-        printf("Input Extension name: ");
-        scanf("%s", ext);
-
-        multiple_arg = (MultipleArg *)malloc(sizeof(MultipleArg));
-        strcpy(multiple_arg->option, ext);
-        if (pthread_create(&Multiple_take, NULL, Loop_Filename, (void *)multiple_arg) != 0)
-        {
-            puts("pthread_create() error");
-            exit(1);
-        }
-
-        if (pthread_join(Multiple_take, &thr_ret) != 0)
-        {
-            puts("pthread_join() error");
-            exit(1);
-        }
-
-        Print_Success();
-        free(thr_ret);
-
-        break;
-
-    case 2:
-        printf("Input Filename: ");
-        scanf("%s", name);
-        multiple_arg = (MultipleArg *)malloc(sizeof(MultipleArg));
-        strcpy(multiple_arg->option, name);
-
-        if (pthread_create(&Multiple_take, NULL, Loop_Filename, (void *)multiple_arg) != 0)
-        {
-            puts("pthread_create() error");
-            exit(1);
-        }
-        if (pthread_join(Multiple_take, &thr_ret) != 0)
-        {
-            puts("pthread_join() error");
-            exit(1);
-        }
-        Print_Success();
-        free(thr_ret);
-        break;
-
-    case 3:
-        printf("--------------------\n");
-        printf("Start Year : ");
-        scanf("%d", &st.tm_year);
-        printf("Start Month : ");
-        scanf("%d", &st.tm_mon);
-        printf("Start Day : ");
-        scanf("%d", &st.tm_mday);
-        printf("--------------------\n");
-        printf("End Year : ");
-        scanf("%d", &ed.tm_year);
-        printf("End Month : ");
-        scanf("%d", &ed.tm_mon);
-        printf("End Day : ");
-        scanf("%d", &ed.tm_mday);
-
-        st_time = MakeLocalTime_t(st.tm_year, st.tm_mon, st.tm_mday);
-        ed_time = MakeLocalTime_t(ed.tm_year, ed.tm_mon, ed.tm_mday);
-
-        multiple_arg = (MultipleArg *)malloc(sizeof(MultipleArg));
-
-        multiple_arg->start_time = st_time;
-        multiple_arg->end_time = ed_time;
-
-        if (pthread_create(&Multiple_take, NULL, Loop_Distance, (void *)multiple_arg) != 0)
-        {
-            puts("pthread_create() error");
-            exit(1);
-        }
-        if (pthread_join(Multiple_take, &thr_ret) != 0)
-        {
-            puts("pthread_join() error");
-            exit(1);
-        }
-
-        Print_Success();
-        free(thr_ret);
-        break;
-    default:
-        printf("wrong value..\n");
-        printf("Try again!! :-)\n");
-        break;
-    }
 }
 
 WINDOW **menuList(int start_col)
@@ -395,8 +291,8 @@ void credit(WINDOW *scr)
     mvwprintw(scr, 6, 2, "           Members of Team 6        ");
     mvwprintw(scr, 7, 2, "      ID          Name        Major");
     mvwprintw(scr, 8, 2, "-------------------------------------");
-    mvwprintw(scr, 9, 2, "  2018####32   Minkyu Kim      EE");
-    mvwprintw(scr, 10, 2, "  2020####75   Sunwoo Ahn      CSE");
+    mvwprintw(scr, 9, 2, "  2018####32   Minkyu Kim      EE -> escaped");
+    mvwprintw(scr, 10, 2, "  2020116575   Sunwoo Ahn      CSE");
     mvwprintw(scr, 11, 2, "  2021115360   Donghyeok Seo   CSE");
     mvwprintw(scr, 12, 2, "**************************************");
     mvwprintw(scr, 13, 2, "  Version : 0.0, Date : 2023-04-30");
@@ -406,10 +302,11 @@ void credit(WINDOW *scr)
 void moveOpt1(WINDOW *scr)
 {
     /* Option Variable */
-    char ext[BUFSIZE];
+    char ext[BUFSIZE], tmp[BUFSIZE], *tok;
+    int input[BUFSIZE];
     /* Thread variable */
     pthread_t first_take;
-    MultipleArg *multiple_arg;
+    MultipleArg multiple_arg;
     void *thr_ret;
     echo();
     werase(scr);
@@ -417,15 +314,16 @@ void moveOpt1(WINDOW *scr)
     mvwprintw(scr, 2, 2, "----------------------------------------------------------------");
     mvwprintw(scr, 3, 2, " String that name include (for instance : .c, .java)");
     mvwprintw(scr, 4, 2, " String : ");
-    mvwscanw(scr, 4, 12, "%s", ext);
+    mvwscanw(scr, 4, 12, " %s", ext);
     mvwprintw(scr, 5, 2, "---------------------------------------------------------------");
 
     /* From home directory and Selecting files according to Extension option */
-    multiple_arg = (MultipleArg *)malloc(sizeof(MultipleArg));
-    strcpy(multiple_arg->filepath, "/home");
-    strcpy(multiple_arg->option, ext);
+    multiple_arg.filepath = "/home";
+    multiple_arg.option = ext;
+    //strcpy(multiple_arg->filepath, "/home");
+    //strcpy(multiple_arg->option, ext);
 
-    if (pthread_create(&first_take, NULL, Selecting_Filename, (void *)multiple_arg) != 0)
+    if (pthread_create(&first_take, NULL, Selecting_Filename, (void *)&multiple_arg) != 0)
     {
         puts("pthread_create() error");
         exit(1);
@@ -436,8 +334,25 @@ void moveOpt1(WINDOW *scr)
         puts("pthread_join() error");
         exit(1);
     }
-    werase(scr);
-    Print_Success(scr);
+
+    int pages = idx / 20;
+    int j = 0;
+    for (int i = 0; i < pages; i++)
+    {
+        Print_Success(scr, i);
+        memset(tmp, 0, sizeof(tmp));
+        mvwprintw(scr, 24, 2, "choose the index numbers, delimeter is \' \'(space)");
+        mvwscanw(scr, 25, 2, " %s", tmp);
+        tok = strtok(tmp, " ");
+        while (tok != NULL)
+        {
+            input[j] = (atoi(tok) - 1)+ (i  * 20);
+            tok = strtok(NULL, " ");
+            j++;
+        }
+        werase(scr);
+    }
+    noecho();
     free(thr_ret);
 }
 void moveOpt2(WINDOW *scr)
@@ -459,7 +374,7 @@ void moveOpt2(WINDOW *scr)
     multiple_arg = (MultipleArg *)malloc(sizeof(MultipleArg));
     strcpy(multiple_arg->filepath, "/home");
     strcpy(multiple_arg->option, name);
-
+    noecho();
     if (pthread_create(&first_take, NULL, Selecting_Filename, (void *)multiple_arg) != 0)
     {
         puts("pthread_create() error");
@@ -471,7 +386,7 @@ void moveOpt2(WINDOW *scr)
         exit(1);
     }
     werase(scr);
-    Print_Success(scr);
+    Print_Success(scr, 1);
     free(thr_ret);
 }
 void moveOpt3(WINDOW *scr)
@@ -513,7 +428,7 @@ void moveOpt3(WINDOW *scr)
     strcpy(multiple_arg->filepath, "/home");
     multiple_arg->start_time = st_time;
     multiple_arg->end_time = ed_time;
-
+    noecho();
     if (pthread_create(&first_take, NULL, Selecting_time_distance, (void *)multiple_arg) != 0)
     {
         puts("pthread_create() error");
@@ -525,7 +440,7 @@ void moveOpt3(WINDOW *scr)
         exit(1);
     }
     werase(scr);
-    Print_Success(scr);
+    Print_Success(scr, 1);
     free(thr_ret);
 }
 
