@@ -15,8 +15,10 @@ typedef struct
 
 typedef struct
 {
-    char filepath[BUFSIZE]; /* File path */
-    char option[BUFSIZE];   /* Option to find*/
+    //char filepath[BUFSIZE]; /* File path */
+    //char option[BUFSIZE];   /* Option to find*/
+    char *filepath;
+    char *option;
     int start_time;         /* Start Time of Sidstance */
     int end_time;           /* End Time of Distance */
     int idx;                /* List Index */
@@ -29,4 +31,6 @@ extern int idx;                 /* Link Arr Index */
 #define ON 1
 #define OFF 0
 
-/* Flag setting to filtering */
+extern char MOVE_FILE_PATH[BUFSIZE];
+extern char BACK_UP_PATH[BUFSIZE];
+
