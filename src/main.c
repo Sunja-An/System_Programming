@@ -29,6 +29,8 @@ extern Node *Link_Arr[BUFSIZE]; /* Saving Node* variable to link*/
 extern int idx;                 /* Link Arr Index */
 char CONFIG_FILE;
 char CACHE_FILE;
+char MOVE_FILE_PATH[BUFSIZE];
+char BACK_UP_PATH[BUFSIZE];
 
 void menu(int selection);
 void sidemenu(int selection);
@@ -122,7 +124,7 @@ void sidemenu(int selection)
     /* Thread variable */
     pthread_t Multiple_take;
 
-    MultipleArg *multiple_arg;
+    MultipleArg* multiple_arg;
     void *thr_ret;
     switch (selection)
     {
@@ -131,9 +133,12 @@ void sidemenu(int selection)
         printf("Input Extension name: ");
         scanf("%s", ext);
 
-        multiple_arg = (MultipleArg *)malloc(sizeof(MultipleArg));
-        strcpy(multiple_arg->option, ext);
-        if (pthread_create(&Multiple_take, NULL, Loop_Filename, (void *)multiple_arg) != 0)
+        /* Thread Argument Setting*/
+
+        //multiple_arg->option = (char*)malloc(sizeof(char)*BUFSIZE);
+        multiple_arg->option = ext;
+        //strcpy(multiple_arg->option, ext);
+        if (pthread_create(&Multiple_take, NULL, Loop_Filename, (void *)&multiple_arg) != 0)
         {
             puts("pthread_create() error");
             exit(1);
@@ -154,6 +159,7 @@ void sidemenu(int selection)
         printf("Input Filename: ");
         scanf("%s", name);
         multiple_arg = (MultipleArg *)malloc(sizeof(MultipleArg));
+        multiple_arg->option = (char*)malloc(sizeof(char)*BUFSIZE);
         strcpy(multiple_arg->option, name);
 
         if (pthread_create(&Multiple_take, NULL, Loop_Filename, (void *)multiple_arg) != 0)
@@ -190,7 +196,6 @@ void sidemenu(int selection)
         ed_time = MakeLocalTime_t(ed.tm_year, ed.tm_mon, ed.tm_mday);
 
         multiple_arg = (MultipleArg *)malloc(sizeof(MultipleArg));
-
         multiple_arg->start_time = st_time;
         multiple_arg->end_time = ed_time;
 
@@ -398,7 +403,7 @@ void credit(WINDOW *scr)
     mvwprintw(scr, 7, 2, "      ID          Name        Major");
     mvwprintw(scr, 8, 2, "-------------------------------------");
     mvwprintw(scr, 9, 2, "  2018####32   Minkyu Kim      EE");
-    mvwprintw(scr, 10, 2, "  2020####75   Sunwoo Ahn      CSE");
+    mvwprintw(scr, 10, 2, "  2020116575   Sunwoo Ahn      CSE");
     mvwprintw(scr, 11, 2, "  2021115360   Donghyeok Seo   CSE");
     mvwprintw(scr, 12, 2, "**************************************");
     mvwprintw(scr, 13, 2, "  Version : 0.0, Date : 2023-04-30");
@@ -412,7 +417,7 @@ void moveOpt1(WINDOW *scr)
     int input[BUFSIZE];
     /* Thread variable */
     pthread_t first_take;
-    MultipleArg *multiple_arg;
+    MultipleArg multiple_arg;
     void *thr_ret;
     echo();
     werase(scr);
@@ -424,11 +429,12 @@ void moveOpt1(WINDOW *scr)
     mvwprintw(scr, 5, 2, "---------------------------------------------------------------");
 
     /* From home directory and Selecting files according to Extension option */
-    multiple_arg = (MultipleArg *)malloc(sizeof(MultipleArg));
-    strcpy(multiple_arg->filepath, "/home");
-    strcpy(multiple_arg->option, ext);
+    multiple_arg.filepath = "/home";
+    multiple_arg.option = ext;
+    //strcpy(multiple_arg->filepath, "/home");
+    //strcpy(multiple_arg->option, ext);
 
-    if (pthread_create(&first_take, NULL, Selecting_Filename, (void *)multiple_arg) != 0)
+    if (pthread_create(&first_take, NULL, Selecting_Filename, (void *)&multiple_arg) != 0)
     {
         puts("pthread_create() error");
         exit(1);
@@ -459,7 +465,6 @@ void moveOpt1(WINDOW *scr)
         wprintw(scr, "\n%d", input[0]);
     }
     noecho();
-
     free(thr_ret);
 }
 void moveOpt2(WINDOW *scr)
