@@ -70,12 +70,23 @@ For building and running the application you need:
 #### Environment
 
 
+![ubuntu](https://github.com/Sunja-An/System_Programming/assets/110546006/3c3ee65b-853c-425f-86bf-63ecf649ef8c)
+![visualstudiocode](https://github.com/Sunja-An/System_Programming/assets/110546006/1f66a06b-a3f5-4119-9fe7-9a2dc9e6ae9e)
+![linux](https://github.com/Sunja-An/System_Programming/assets/110546006/e25ef020-21fe-40de-9eb9-77f51a69da00)
+
+
 #### Development
+
+
+![c](https://github.com/Sunja-An/System_Programming/assets/110546006/7221dd08-5b6e-4cce-bea2-b32f4b5f8003)
 
 
 #### Communication
 
 
+![github](https://github.com/Sunja-An/System_Programming/assets/110546006/efec4f2a-b17a-46b5-90a0-f20b5aa39042)
+![notion](https://github.com/Sunja-An/System_Programming/assets/110546006/89d7fca9-abb0-4fde-a484-d880181ef8ba)
+![discord](https://github.com/Sunja-An/System_Programming/assets/110546006/6e6c0e2c-49f8-42a1-8555-2a4a4faef428)
 
 
 ### 주요 기능
