@@ -44,4 +44,4 @@ void back_up(int* arr);
 void moving(int* arr);
 
 /* String Setting */
-char* cutting_filename(char* filename);
+char* cutting_filename(char* filepath, int flag);
