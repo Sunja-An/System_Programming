@@ -14,15 +14,17 @@ extern char CACHE_FILE;
 /* Not implemented */
 void Print_Success(WINDOW *scr, int page)
 {
-    mvwprintw(scr, 1, 2,"[Page %d]%s", page, CUT);
-    scrollok(scr, TRUE);
+    werase(scr);
+    mvwprintw(scr, 1, 2, "number of files are %d\n", idx);
+    mvwprintw(scr, 2, 2, "[Page %d/%d]%s\n", page, idx/20, CUT);
     for (int i = 0; i < 20; i++)
     {
         if (Link_Arr[i+page*20] == NULL)
             continue;
-        mvwprintw(scr, i+2, 2, "%d %s \n", i+1, Link_Arr[i+page*20]->filepath);
+        mvwprintw(scr, i+3, 2, "%d %s", i+1, Link_Arr[i+page*20]->filepath);
     }
-    mvwprintw(scr, 23, 2,"%s[Page %d]", CUT, page);
+    mvwprintw(scr, 24, 2, "%s[Page %d/%d]", CUT, page, idx/20);
+    wrefresh(scr);
 }
 
 void Print_Failed()

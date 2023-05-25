@@ -18,12 +18,12 @@ void moveMode(WINDOW *scr);
 void copyMode(WINDOW *scr);
 void title(WINDOW *scr);
 void credit(WINDOW *scr);
-void moveOpt1(WINDOW *scr);
-void moveOpt2(WINDOW *scr);
-void moveOpt3(WINDOW *scr);
-void copyOpt1(WINDOW *scr);
-void copyOpt2(WINDOW *scr);
-void copyOpt3(WINDOW *scr);
+int* moveOpt1(WINDOW *scr);
+int* moveOpt2(WINDOW *scr);
+int* moveOpt3(WINDOW *scr);
+int* copyOpt1(WINDOW *scr);
+int* copyOpt2(WINDOW *scr);
+int* copyOpt3(WINDOW *scr);
 
 extern Node *Link_Arr[BUFSIZE]; /* Saving Node* variable to link*/
 extern int idx;                 /* Link Arr Index */
@@ -299,11 +299,11 @@ void credit(WINDOW *scr)
     mvwprintw(scr, 14, 2, "**************************************");
 }
 
-void moveOpt1(WINDOW *scr)
+int* moveOpt1(WINDOW *scr)
 {
     /* Option Variable */
     char ext[BUFSIZE], tmp[BUFSIZE], *tok;
-    int input[BUFSIZE];
+    int* input = (int*)malloc(4*BUFSIZE);
     /* Thread variable */
     pthread_t first_take;
     MultipleArg multiple_arg;
@@ -337,12 +337,12 @@ void moveOpt1(WINDOW *scr)
 
     int pages = idx / 20;
     int j = 0;
-    for (int i = 0; i < pages; i++)
+    for (int i = 0; i <= pages; i++)
     {
         Print_Success(scr, i);
         memset(tmp, 0, sizeof(tmp));
-        mvwprintw(scr, 24, 2, "choose the index numbers, delimeter is \' \'(space)");
-        mvwscanw(scr, 25, 2, " %s", tmp);
+        mvwprintw(scr, 25, 2, "choose the index numbers, delimeter is \' \'(space)");
+        mvwgetstr(scr, 26, 2, tmp);
         tok = strtok(tmp, " ");
         while (tok != NULL)
         {
@@ -350,32 +350,35 @@ void moveOpt1(WINDOW *scr)
             tok = strtok(NULL, " ");
             j++;
         }
-        werase(scr);
     }
     noecho();
+    title(scr);
+    wrefresh(scr);
     free(thr_ret);
+    return input;
 }
-void moveOpt2(WINDOW *scr)
+int* moveOpt2(WINDOW *scr)
 {
     /* Option Variable */
-    char name[BUFSIZE];
+    char name[BUFSIZE], tmp[BUFSIZE], *tok;
+    int* input = (int*)malloc(4*BUFSIZE);
     /* Thread variable */
     pthread_t first_take;
-    MultipleArg *multiple_arg;
+    MultipleArg multiple_arg;
     void *thr_ret;
     echo();
     werase(scr);
     mvwprintw(scr, 1, 2, "Option 2 : extension Collection");
     mvwprintw(scr, 2, 2, "----------------------------------------------------------------");
-    mvwprintw(scr, 3, 2, " String that name include (for instance : .c, .java)");
+    mvwprintw(scr, 3, 2, " String that name include ");
     mvwprintw(scr, 4, 2, " String : ");
     mvwscanw(scr, 4, 12, "%s", name);
     mvwprintw(scr, 5, 2, "---------------------------------------------------------------");
-    multiple_arg = (MultipleArg *)malloc(sizeof(MultipleArg));
-    strcpy(multiple_arg->filepath, "/home");
-    strcpy(multiple_arg->option, name);
+
+    multiple_arg.filepath = "/home";
+    multiple_arg.option = name;
     noecho();
-    if (pthread_create(&first_take, NULL, Selecting_Filename, (void *)multiple_arg) != 0)
+    if (pthread_create(&first_take, NULL, Selecting_Filename, (void *)&multiple_arg) != 0)
     {
         puts("pthread_create() error");
         exit(1);
@@ -385,11 +388,29 @@ void moveOpt2(WINDOW *scr)
         puts("pthread_join() error");
         exit(1);
     }
-    werase(scr);
-    Print_Success(scr, 1);
+    int pages = idx / 20;
+    int j = 0;
+    for (int i = 0; i <= pages; i++)
+    {
+        Print_Success(scr, i);
+        memset(tmp, 0, sizeof(tmp));
+        mvwprintw(scr, 25, 2, "choose the index numbers, delimeter is \' \'(space)");
+        mvwgetstr(scr, 26, 2, tmp);
+        tok = strtok(tmp, " ");
+        while (tok != NULL)
+        {
+            input[j] = (atoi(tok) - 1)+ (i  * 20);
+            tok = strtok(NULL, " ");
+            j++;
+        }
+    }
+    noecho();
+    title(scr);
+    wrefresh(scr);
     free(thr_ret);
+    return input;
 }
-void moveOpt3(WINDOW *scr)
+int* moveOpt3(WINDOW *scr)
 {
     /* time distance variable */
     struct tm st;
@@ -444,7 +465,7 @@ void moveOpt3(WINDOW *scr)
     free(thr_ret);
 }
 
-void copyOpt1(WINDOW *scr)
+int* copyOpt1(WINDOW *scr)
 {
     int xYear, xMon, xDate, yYear, yMon, yDate;
     time_t start, end;
@@ -471,7 +492,7 @@ void copyOpt1(WINDOW *scr)
     start = MakeLocalTime_t(xYear, xMon, xDate);
     end = MakeLocalTime_t(yYear, yMon, yDate);
 }
-void copyOpt2(WINDOW *scr)
+int* copyOpt2(WINDOW *scr)
 {
     char *str;
     echo();
@@ -484,7 +505,7 @@ void copyOpt2(WINDOW *scr)
     mvwprintw(scr, 5, 2, "---------------------------------------------------------------");
     Name_find(".", str);
 }
-void copyOpt3(WINDOW *scr)
+int* copyOpt3(WINDOW *scr)
 {
     int xYear, xMon, xDate, yYear, yMon, yDate;
     time_t start, end;
