@@ -4,6 +4,9 @@
 > 팀 프로젝트
 
 
+![FTM LOGO 2](https://github.com/Sunja-An/System_Programming/assets/110546006/cbf6ef6e-8a77-4603-b8e5-26295287a3e4)
+
+
 ### 팀 소개
 > 경북대학교 컴퓨터학부 글로벌SW융합학과 20학번 안선우 [@Sunja-An](https://github.com/Sunja-An)
 
@@ -30,12 +33,22 @@ We want to consumer that using this program feel 편리함과 간편함을 느�
 
 ### 시작 가이드
 **Requirement**
+
+
 For building and running the application you need:
 
 - Ubuntu 18.04.LTS
 - lpthread Package
 - lncurses Package
-
+**Required Package Installation**
+    ##### lpthread
+    sudo apt-get update
+    sudo apt-get install libpthread-stubs0-dev
+    
+    ##### ncurses
+    sudo apt-get update
+    sudo apt-get install libncurses5-dev libncursesw5-dev
+    
 **Installation**
 
     git clone https://github.com/Sunja-An/System_Programming.git
