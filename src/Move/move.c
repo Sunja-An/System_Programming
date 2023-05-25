@@ -11,23 +11,21 @@ extern char CACHE_FILE;
 
 void *Selecting_Filename(void *args)
 {
+    memset(&idx, 0, sizeof(int)); 
     MultipleArg *multiple_arg = (MultipleArg*)args;
-    memset(&idx, 0, sizeof(int));
 
     /* Variable */
     DIR *dir_ptr;
     struct stat info;
     struct dirent *direntp;
-    char filename[BUFSIZE];
-    char name[BUFSIZE];
+    char *filename;
+    char *name;
     char path[256];
     char newpath[256];
 
     /* Variable Setting */
-    //filename = strdup(multiple_arg->filepath);
-    //name = strdup(multiple_arg->option);
-    strcpy(filename, multiple_arg->filepath);
-    strcpy(name, multiple_arg->option);
+    filename = multiple_arg->filepath;
+    name = multiple_arg->option;
 
     /* Change the directory */
     if (chdir(filename) != 0)
@@ -65,10 +63,10 @@ void *Selecting_Filename(void *args)
 
                 /* If File is directory, get Inside and search ( Recursive ) */
                 if (!Directory_check(&info))
-                    Name_find(newpath, name);
+                    Name_find(newpath, name, multiple_arg->select);
                 /* If not directory, checking Extension */
                 else
-                    Name_check(newpath, direntp->d_name, name, &info);
+                    Name_check(newpath, direntp->d_name, name, multiple_arg->select,&info);
             }
         }
         closedir(dir_ptr);
@@ -77,7 +75,7 @@ void *Selecting_Filename(void *args)
 }
 
 // File find. Not directory
-void Name_find(char *dirpath, char *name)
+void Name_find(char *dirpath, char *name, int select)
 {
     /* Variable */
     DIR *dir_ptr;
@@ -112,25 +110,28 @@ void Name_find(char *dirpath, char *name)
                 continue;
             if ((strstr(direntp->d_name, "extensions") != NULL))
                 continue;
+
+            
             strcpy(newpath, dirpath);
             strcat(newpath, slash);
             strcat(newpath, direntp->d_name);
+            
             if (stat(newpath, &info) == -1)
                 perror(dirpath);
             else
             {
                 // Directory?
                 if (!Directory_check(&info))
-                    Name_find(newpath, name);
+                    Name_find(newpath, name,select);
                 else
-                    Name_check(newpath, direntp->d_name, name, &info);
+                    Name_check(newpath, direntp->d_name, name, select,&info);
             }
         }
         closedir(dir_ptr);
     }
 }
 
-void Name_check(char *filepath, char *filename, char *name, struct stat *info)
+void Name_check(char *filepath, char *filename, char *name, int select,struct stat *info)
 {
     char newfilepath[256];
     if (name != NULL)
@@ -142,7 +143,7 @@ void Name_check(char *filepath, char *filename, char *name, struct stat *info)
             strcpy(newfilepath, filepath);
             /* Put in data to use list */
             strcpy(newnode->filepath, newfilepath);
-            newnode->filename = cutting_filename(newfilepath,1);
+            newnode->filename = cutting_filename(newfilepath, select);
             newnode->atime = info->st_atime;
             fflush(stdout);
             /* Put in list */
@@ -277,6 +278,7 @@ void Atime_check(char *filepath, int st, int ed, struct stat *info)
 
         /* Put in data to use list */
         strcpy(newnode->filepath, newfilepath);
+        newnode->filename = cutting_filename(newfilepath, 1);
         newnode->atime = info->st_atime;
 
         fflush(stdout);
@@ -390,23 +392,21 @@ int filecopy(const char *src, const char *dst){
     return 0;
 }
 
-void moving(int* arr, int size){
+void moving(int* arr, int num){
     int i = 0;
-    int sz = sizeof(arr)/sizeof(int);
-    while(i<sz){
+    while(i< num){
         rename(Link_Arr[arr[i++]]->filepath, MOVE_FILE_PATH);
     }
 }
 
-void back_up(int* arr){
+void back_up(int* arr, int num){
     int i = 0;
-    int sz = sizeof(arr)/sizeof(int);
     char* BACK_UP = "";
     strcat(BACK_UP, BACK_UP_PATH);
-    while(i<sz){
+    while(i<num){
         /* Back up file path setting */
         strcat(BACK_UP, slash);
-        strcat(BACK_UP, cutting_filename(Link_Arr[arr[i]]->filepath));
+        strcat(BACK_UP, cutting_filename(Link_Arr[arr[i]]->filepath,1));
 
         /* File Copy */
         switch(filecopy(Link_Arr[arr[i++]]->filepath, BACK_UP)){
@@ -424,14 +424,26 @@ void back_up(int* arr){
     }
 }
 
-char* cutting_filename(char* filename){
+/* Cutting filepath to extract filename and file's extension */
+char* cutting_filename(char* filepath, int flag){
     char* token;
     char* prev;
-    token = strtok(filename, "/");
-    
-    while(token != NULL){
-        prev = token;
-        token = strtok(NULL,"/");
+
+    /* Flag ON is extracting filename */
+    /* FLAG OFF is extracting extension */
+    if(flag){
+        token = strtok(filepath, "/");
+        while(token != NULL){
+            prev = token;
+            token = strtok(NULL,"/");
+        }
+    } 
+    else{
+        token = strtok(filepath, ".");
+        while(token != NULL){
+            prev = token;
+            token = strtok(NULL,".");
+        }
     }
     return prev;
 }
