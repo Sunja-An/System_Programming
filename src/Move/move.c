@@ -11,19 +11,21 @@ extern char CACHE_FILE;
 
 void *Selecting_Filename(void *args)
 {
-    MultipleArg *multiple_arg = (MultipleArg *)args;
+    MultipleArg *multiple_arg = (MultipleArg*)args;
     memset(&idx, 0, sizeof(int));
 
     /* Variable */
     DIR *dir_ptr;
     struct stat info;
     struct dirent *direntp;
-    char *filename;
-    char *name;
+    char filename[BUFSIZE];
+    char name[BUFSIZE];
     char path[256];
     char newpath[256];
 
     /* Variable Setting */
+    //filename = strdup(multiple_arg->filepath);
+    //name = strdup(multiple_arg->option);
     strcpy(filename, multiple_arg->filepath);
     strcpy(name, multiple_arg->option);
 
@@ -313,7 +315,7 @@ void RemoveFirst(char *buf)
     buf[i - 1] = '\0';
 }
 
-static void *Loop_Filename(void *args)
+void *Loop_Filename(void *args)
 {
     MultipleArg *multiple_arg = (MultipleArg *)args;
     /* Variable */
@@ -340,7 +342,7 @@ static void *Loop_Filename(void *args)
 }
 
 /* Selecting File or Directory [Recursive] */
-static void *Loop_Distance(void *args)
+void *Loop_Distance(void *args)
 {
     MultipleArg *multiple_arg = (MultipleArg *)args;
 
@@ -362,4 +364,74 @@ static void *Loop_Distance(void *args)
     }
 
     return NULL;
+}
+
+int filecopy(const char *src, const char *dst){
+    FILE *fsrc, *fdst;
+    char buf[BUFSIZE];
+    size_t n_size;
+    if(!strcmp(src, dst)) 
+        return 1;
+    if( (fsrc = fopen(src,"rb")) == NULL )
+        return 2;
+    if( (fdst = fopen(dst,"wb")) == NULL)
+        return 3;
+    while((n_size = fread(buf, 1, sizeof(buf),fsrc)) > 0){
+        if( fwrite(buf, 1, n_size, fdst) == 0){
+            fclose(fsrc);
+            fclose(fdst);
+            unlink(dst);
+            return 4;
+        }
+    }
+    fclose(fsrc);
+    fclose(fdst);
+
+    return 0;
+}
+
+void moving(int* arr){
+    int i = 0;
+    int sz = sizeof(arr)/sizeof(int);
+    while(i<sz){
+        rename(Link_Arr[arr[i++]]->filepath, MOVE_FILE_PATH);
+    }
+}
+
+void back_up(int* arr){
+    int i = 0;
+    int sz = sizeof(arr)/sizeof(int);
+    char* BACK_UP = "";
+    strcat(BACK_UP, BACK_UP_PATH);
+    while(i<sz){
+        /* Back up file path setting */
+        strcat(BACK_UP, slash);
+        strcat(BACK_UP, cutting_filename(Link_Arr[arr[i]]->filepath));
+
+        /* File Copy */
+        switch(filecopy(Link_Arr[arr[i++]]->filepath, BACK_UP)){
+        case 1:
+            printf("대상 파일의 이름이 원본과 같음.\n");
+        case 2:
+            printf("원본 파일 읽기 에러\n");
+        case 3:
+            printf("사본 파일 생성 에러\n");
+        case 4:
+            printf("사본 파일 쓰기 에러\n");
+        default:
+            printf("복사 완료.\n");
+        }
+    }
+}
+
+char* cutting_filename(char* filename){
+    char* token;
+    char* prev;
+    token = strtok(filename, "/");
+    
+    while(token != NULL){
+        prev = token;
+        token = strtok(NULL,"/");
+    }
+    return prev;
 }
