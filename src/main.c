@@ -316,7 +316,8 @@ void config(WINDOW *scr){
 void moveOpt1(WINDOW *scr)
 {
     /* Option Variable */
-    char ext[BUFSIZE];
+    char ext[BUFSIZE], tmp[BUFSIZE], *tok, *toktmp;
+    int input[BUFSIZE];
     /* Thread variable */
     pthread_t first_take;
     MultipleArg multiple_arg;

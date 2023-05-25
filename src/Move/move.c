@@ -138,11 +138,11 @@ void Name_check(char *filepath, char *filename, char *name, struct stat *info)
         if (strstr(filename, name) != NULL)
         {
             Node *newnode = (Node *)malloc(sizeof(Node));
-
             /* File Path Take */
             strcpy(newfilepath, filepath);
             /* Put in data to use list */
             strcpy(newnode->filepath, newfilepath);
+            newnode->filename = cutting_filename(newfilepath,1);
             newnode->atime = info->st_atime;
             fflush(stdout);
             /* Put in list */

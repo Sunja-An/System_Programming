@@ -19,6 +19,10 @@ typedef struct
     //char option[BUFSIZE];   /* Option to find*/
     char *filepath;
     char *option;
+    //char filepath[BUFSIZE]; /* File path */
+    //char option[BUFSIZE];   /* Option to find*/
+    char *filepath;
+    char *option;
     int start_time;         /* Start Time of Sidstance */
     int end_time;           /* End Time of Distance */
     int idx;                /* List Index */

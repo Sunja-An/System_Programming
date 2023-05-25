@@ -14,6 +14,7 @@
 #include <grp.h>
 #include <pthread.h>
 #include <ncurses.h>
+#include <ncurses.h>
 
 /* ls command and find the files according to conditions */
 void *Selecting_Filename(void *args);
