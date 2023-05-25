@@ -41,7 +41,7 @@ void *Loop_Distance(void *args);
 /* Selected files to move and backup */
 int filecopy(const char *src, const char *dst);
 void back_up(int* arr);
-void moving(int* arr);
+void moving(int* arr, int size);
 
 /* String Setting */
 char* cutting_filename(char* filename);

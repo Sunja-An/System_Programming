@@ -1,7 +1,6 @@
 #include "../Move/move.h"
 #include "../Struct/tree.h"
 #include "print_form.h"
-#include <ncurses.h>
 
 #define CUT "---------------------------------------------------------------------------------------------------------------------"
 

@@ -390,7 +390,7 @@ int filecopy(const char *src, const char *dst){
     return 0;
 }
 
-void moving(int* arr){
+void moving(int* arr, int size){
     int i = 0;
     int sz = sizeof(arr)/sizeof(int);
     while(i<sz){

@@ -1,34 +1,13 @@
 #include "Move/move.h"
 #include "Struct/tree.h"
 #include "Print/print_form.h"
-#include <ncurses.h>
-
-#define ESCAPE 27
-#define ENTER 10
-
-// for ui
-char *fileItem[] = {"", "move", "copy", "main menu", "credits"};
-WINDOW **menuList(int start_col);
-void makeMenubar(WINDOW *menubar);
-void deleteMenu(WINDOW **items, int count);
-int scrollMenu(WINDOW **items, int count, int menu_start_col, int index_num);
-int checkQuit();
-void initScreen();
-void moveMode(WINDOW *scr);
-void copyMode(WINDOW *scr);
-void title(WINDOW *scr);
-void credit(WINDOW *scr);
-int* moveOpt1(WINDOW *scr);
-int* moveOpt2(WINDOW *scr);
-int* moveOpt3(WINDOW *scr);
-int* copyOpt1(WINDOW *scr);
-int* copyOpt2(WINDOW *scr);
-int* copyOpt3(WINDOW *scr);
+#include "ui.h"
 
 extern Node *Link_Arr[BUFSIZE]; /* Saving Node* variable to link*/
 extern int idx;                 /* Link Arr Index */
 char CONFIG_FILE;
 char CACHE_FILE;
+int FORM = 0;
 char MOVE_FILE_PATH[BUFSIZE];
 char BACK_UP_PATH[BUFSIZE];
 
@@ -44,7 +23,7 @@ int main(int argc, char *argv[])
     WINDOW *menubar, *exeScreen, *about;
     int key, status;
     initScreen();
-    bkgd(COLOR_PAIR(1));
+    bkgd(COLOR_PAIR(color));
     menubar = subwin(stdscr, 1, 130, 0, 0);
     exeScreen = subwin(stdscr, 30, 130, 1, 0);
     title(exeScreen);
@@ -57,7 +36,7 @@ int main(int argc, char *argv[])
 
         key = getch();
         wrefresh(exeScreen);
-
+        
         if (key == 'a' || key == 'A')
         {
             menuItems = menuList(0);
@@ -88,7 +67,9 @@ int main(int argc, char *argv[])
             if (checkQuit() == 1)
                 break;
         }
+        if (key == 'c' || key == 'C') config(exeScreen);
         touchwin(stdscr);
+        title(exeScreen);
         refresh();
     }
     endwin();
@@ -278,7 +259,9 @@ void title(WINDOW *scr)
     mvwprintw(scr, 3, 2, "----------------------------------");
     mvwprintw(scr, 4, 2, "-  Press the button              -");
     mvwprintw(scr, 5, 2, "-  a : open menu, q : quit       -");
-    mvwprintw(scr, 6, 2, "----------------------------------");
+    mvwprintw(scr, 6, 2, "-  c : configuration             -");
+    mvwprintw(scr, 7, 2, "----------------------------------");
+    wrefresh(scr);
 }
 void credit(WINDOW *scr)
 {
@@ -295,15 +278,45 @@ void credit(WINDOW *scr)
     mvwprintw(scr, 10, 2, "  2020116575   Sunwoo Ahn      CSE");
     mvwprintw(scr, 11, 2, "  2021115360   Donghyeok Seo   CSE");
     mvwprintw(scr, 12, 2, "**************************************");
-    mvwprintw(scr, 13, 2, "  Version : 0.0, Date : 2023-04-30");
+    mvwprintw(scr, 13, 2, "  Version : 0.0, Date : 2023-05-25");
     mvwprintw(scr, 14, 2, "**************************************");
 }
-
-int* moveOpt1(WINDOW *scr)
+void config(WINDOW *scr){
+    int opt;
+    while(1){
+        werase(scr);
+        mvwprintw(scr, 1, 2, " Configuration");
+        mvwprintw(scr, 2, 2, "********************************************");
+        mvwprintw(scr, 3, 2, " Press the button to choose option");
+        mvwprintw(scr, 4, 2, " 1. Set save filepath");
+        mvwprintw(scr, 5, 2, " 2. Set print form");
+        mvwprintw(scr, 6, 2, " 3. Set UI color");
+        mvwprintw(scr, 7, 2, " 4. Go back to main menu");
+        mvwprintw(scr, 8, 2, "********************************************");
+        wrefresh(scr);
+        opt = wgetch(scr);
+        switch (opt)
+        {
+        case '1':
+            con_savepath(scr);
+            break;
+        case '2':
+            con_printpath(scr);
+            break;
+        case '3':
+            colorset(scr);
+            break;
+        case '4':
+            return;
+        default:
+            continue;
+        }
+    }
+}
+void moveOpt1(WINDOW *scr)
 {
     /* Option Variable */
-    char ext[BUFSIZE], tmp[BUFSIZE], *tok;
-    int* input = (int*)malloc(4*BUFSIZE);
+    char ext[BUFSIZE];
     /* Thread variable */
     pthread_t first_take;
     MultipleArg multiple_arg;
@@ -335,29 +348,12 @@ int* moveOpt1(WINDOW *scr)
         exit(1);
     }
 
-    int pages = idx / 20;
-    int j = 0;
-    for (int i = 0; i <= pages; i++)
-    {
-        Print_Success(scr, i);
-        memset(tmp, 0, sizeof(tmp));
-        mvwprintw(scr, 25, 2, "choose the index numbers, delimeter is \' \'(space)");
-        mvwgetstr(scr, 26, 2, tmp);
-        tok = strtok(tmp, " ");
-        while (tok != NULL)
-        {
-            input[j] = (atoi(tok) - 1)+ (i  * 20);
-            tok = strtok(NULL, " ");
-            j++;
-        }
-    }
+    print_takeindex(scr);
     noecho();
-    title(scr);
     wrefresh(scr);
     free(thr_ret);
-    return input;
 }
-int* moveOpt2(WINDOW *scr)
+void moveOpt2(WINDOW *scr)
 {
     /* Option Variable */
     char name[BUFSIZE], tmp[BUFSIZE], *tok;
@@ -377,7 +373,6 @@ int* moveOpt2(WINDOW *scr)
 
     multiple_arg.filepath = "/home";
     multiple_arg.option = name;
-    noecho();
     if (pthread_create(&first_take, NULL, Selecting_Filename, (void *)&multiple_arg) != 0)
     {
         puts("pthread_create() error");
@@ -388,29 +383,12 @@ int* moveOpt2(WINDOW *scr)
         puts("pthread_join() error");
         exit(1);
     }
-    int pages = idx / 20;
-    int j = 0;
-    for (int i = 0; i <= pages; i++)
-    {
-        Print_Success(scr, i);
-        memset(tmp, 0, sizeof(tmp));
-        mvwprintw(scr, 25, 2, "choose the index numbers, delimeter is \' \'(space)");
-        mvwgetstr(scr, 26, 2, tmp);
-        tok = strtok(tmp, " ");
-        while (tok != NULL)
-        {
-            input[j] = (atoi(tok) - 1)+ (i  * 20);
-            tok = strtok(NULL, " ");
-            j++;
-        }
-    }
+    print_takeindex(scr);
     noecho();
-    title(scr);
     wrefresh(scr);
     free(thr_ret);
-    return input;
 }
-int* moveOpt3(WINDOW *scr)
+void moveOpt3(WINDOW *scr)
 {
     /* time distance variable */
     struct tm st;
@@ -465,7 +443,7 @@ int* moveOpt3(WINDOW *scr)
     free(thr_ret);
 }
 
-int* copyOpt1(WINDOW *scr)
+void copyOpt1(WINDOW *scr)
 {
     int xYear, xMon, xDate, yYear, yMon, yDate;
     time_t start, end;
@@ -492,7 +470,7 @@ int* copyOpt1(WINDOW *scr)
     start = MakeLocalTime_t(xYear, xMon, xDate);
     end = MakeLocalTime_t(yYear, yMon, yDate);
 }
-int* copyOpt2(WINDOW *scr)
+void copyOpt2(WINDOW *scr)
 {
     char *str;
     echo();
@@ -505,7 +483,7 @@ int* copyOpt2(WINDOW *scr)
     mvwprintw(scr, 5, 2, "---------------------------------------------------------------");
     Name_find(".", str);
 }
-int* copyOpt3(WINDOW *scr)
+void copyOpt3(WINDOW *scr)
 {
     int xYear, xMon, xDate, yYear, yMon, yDate;
     time_t start, end;
@@ -531,4 +509,88 @@ int* copyOpt3(WINDOW *scr)
     mvwprintw(scr, 12, 2, "---------------------------------------------------------------");
     start = MakeLocalTime_t(xYear, xMon, xDate);
     end = MakeLocalTime_t(yYear, yMon, yDate);
+}
+
+void print_takeindex(WINDOW *scr){
+    int pages = idx / 20;
+    int j = 0;
+    char tmp[BUFSIZE], *tok;
+    int* input = (int*)malloc(4*BUFSIZE);
+    for (int i = 0; i <= pages; i++)
+    {
+        Print_Success(scr, i);
+        memset(tmp, 0, sizeof(tmp));
+        mvwprintw(scr, 25, 2, "choose the index numbers, delimeter is \' \'(space)");
+        mvwgetstr(scr, 26, 2, tmp);
+        tok = strtok(tmp, " ");
+        while (tok != NULL)
+        {
+            input[j] = (atoi(tok) - 1)+ (i  * 20);
+            tok = strtok(NULL, " ");
+            j++;
+        }
+    }
+    moving(input, j+1);
+    free(input);
+}
+
+void con_savepath(WINDOW *scr){
+    werase(scr);
+    echo();
+    wrefresh(scr);
+    mvwprintw(scr, 1, 2, " Set save filepath : input where to save");
+    mvwprintw(scr, 2, 2, " please type absolute path");
+    mvwprintw(scr, 3, 2, " ex) /home/usrname/WorkSpace/fileBackup");
+    mvwprintw(scr, 4, 2, "*************************************************");
+    mvwprintw(scr, 7, 2, "*************************************************");
+    mvwprintw(scr, 5, 2, "Move file path(absolute) : ");
+    mvwgetstr(scr, 6, 2, MOVE_FILE_PATH);
+    noecho();
+    wrefresh(scr);
+}
+void con_printpath(WINDOW *scr){
+    int opt;
+    werase(scr);
+    mvwprintw(scr, 1, 2, "Set print form : choose the form");
+    mvwprintw(scr, 2, 2, "********************************************");
+    mvwprintw(scr, 3, 2, " Press the button to choose option");
+    mvwprintw(scr, 4, 2, " 1. filename with absolute path");
+    mvwprintw(scr, 5, 2, " 2. only filename");
+    mvwprintw(scr, 6, 2, "********************************************");
+    opt = wgetch(scr);
+    switch (opt)
+    {
+    case '1':
+        FORM=0;
+        break;
+    case '2':
+        FORM=1;
+        break;
+    }
+    wrefresh(scr);
+}
+void colorset(WINDOW *scr){
+    int opt;
+    char charopt[1];
+    werase(scr);
+    mvwprintw(scr, 1, 2, "Set UI color : choose the number of colorset");
+    mvwprintw(scr, 2, 2, "*********************************************************");
+    mvwprintw(scr, 3, 2, "color");
+    mvwprintw(scr, 3, 25, "background");
+    mvwprintw(scr, 3, 45, "letter");
+    mvwprintw(scr, 4, 2, " 1");
+    mvwprintw(scr, 4, 25, " blue");
+    mvwprintw(scr, 4, 45, " white");
+    mvwprintw(scr, 5, 2, " 2");
+    mvwprintw(scr, 5, 25, " white");
+    mvwprintw(scr, 5, 45, " blue");
+    mvwprintw(scr, 6, 2, " 3");
+    mvwprintw(scr, 6, 25, " grey");
+    mvwprintw(scr, 6, 45, " red");
+    mvwprintw(scr, 7, 2, "*********************************************************");
+    opt = wgetch(scr);
+    charopt[0] = (char)opt;
+    color = atoi(charopt);
+    bkgd(COLOR_PAIR(color));
+    wrefresh(scr);
 }
