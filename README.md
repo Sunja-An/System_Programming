@@ -41,12 +41,20 @@ For building and running the application you need:
 - lpthread Package
 - lncurses Package
 **Required Package Installation**
-    ##### lpthread
+##### lpthread
+
     sudo apt-get update
+    
+    
     sudo apt-get install libpthread-stubs0-dev
     
-    ##### ncurses
+    
+##### ncurses
+    
+    
     sudo apt-get update
+    
+    
     sudo apt-get install libncurses5-dev libncursesw5-dev
     
 **Installation**
