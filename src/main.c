@@ -12,17 +12,17 @@ int FORM = 0;
 extern char MOVE_FILE_PATH[BUFSIZE];
 extern char BACK_UP_PATH[BUFSIZE];
 
-void menu(int selection);
-void sidemenu(int selection);
-
 int main(int argc, char *argv[])
 {
-    /* init program */
-    CACHE_FILE = OFF;
-    CONFIG_FILE = OFF;
-    strcpy(MOVE_FILE_PATH, "/home");
-    strcpy(BACK_UP_PATH, "/home");
-
+    FILE* fp;
+    if(fp = fopen(".tmp/FTM_MOVE","r")){
+        fclose(fp);
+    }else{    
+        mkdir("/tmp/FTM_MOVE",0777);
+        mkdir("/tmp/FTM_BACK_UP",0744);    
+        strcpy(MOVE_FILE_PATH, "/tmp/FTM_MOVE");
+        strcpy(BACK_UP_PATH, "/tmp/FTM_BACK_UP");
+    }
     WINDOW *menubar, *exeScreen, *about;
     int key, status;
     initScreen();
