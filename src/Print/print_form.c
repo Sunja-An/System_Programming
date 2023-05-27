@@ -20,7 +20,7 @@ void Print_Success(WINDOW *scr, int page)
     {
         if (Link_Arr[i+page*20] == NULL)
             continue;
-        mvwprintw(scr, i+3, 2, "%d %s", i+1, Link_Arr[i+page*20]->filepath);
+        mvwprintw(scr, i+3, 2, "%d %s", i+1, Link_Arr[i+page*20]->filename);
     }
     mvwprintw(scr, 24, 2, "%s[Page %d/%d]", CUT, page, idx/20);
     wrefresh(scr);
