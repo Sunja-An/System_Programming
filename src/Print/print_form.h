@@ -5,7 +5,7 @@
 #include <sys/wait.h>
 #include <ncurses.h>
 
-void Print_Success();
+void Print_Success(WINDOW *scr, int page);
 void Print_Failed();
 void Print_Delete();
 
