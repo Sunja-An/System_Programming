@@ -18,7 +18,7 @@
 /* ls command and find the files according to conditions */
 void *Selecting_Filename(void *args);
 void Name_find(char *dirpath, char *name, int select);
-void Name_check(char *filepath, char *filename, char *name, int select,struct stat *info);
+void Name_check(char *filepath, char filename[], char *name, int select,struct stat *info);
 
 /* Time Distance Find */
 void *Selecting_time_distance(void *args);
