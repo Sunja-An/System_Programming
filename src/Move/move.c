@@ -48,6 +48,7 @@ void *Selecting_Filename(void *args)
         if (strstr(path, "CONFIG") || strstr(path, "config") || strstr(path, "conf"))
             CONFIG_FILE = ON;
     }
+
     // fprintf(stderr, "Selecting_Filename() : cannot open %s\n", path);
     else
     {
@@ -65,9 +66,9 @@ void *Selecting_Filename(void *args)
                 strcat(newpath, direntp->d_name);
 
                 /* If File is directory, get Inside and search ( Recursive ) */
+                /* If not directory, checking Extension */
                 if (!Directory_check(&info))
                     Name_find(newpath, name, multiple_arg->select);
-                /* If not directory, checking Extension */
                 else
                     Name_check(newpath, direntp->d_name, name, multiple_arg->select,&info);
             }
@@ -85,9 +86,7 @@ void Name_find(char *dirpath, char *name, int select)
     struct dirent *direntp;
     struct stat info;
     char newpath[256];
-
-    // printf("Error path: %s\n", dirpath);
-    // fprintf(stderr, "Extension find: cannot open current directory\n");
+    char f_name[256];
 
     if ((dir_ptr = opendir(dirpath)) == NULL)
     {
@@ -113,30 +112,32 @@ void Name_find(char *dirpath, char *name, int select)
                 continue;
             if ((strstr(direntp->d_name, "extensions") != NULL))
                 continue;
-
             
             strcpy(newpath, dirpath);
             strcat(newpath, slash);
             strcat(newpath, direntp->d_name);
             
+            strcpy(f_name, direntp->d_name); // 문제가 발생하는 부분
+
             if (stat(newpath, &info) == -1)
                 perror(dirpath);
             else
             {
-                // Directory?
                 if (!Directory_check(&info))
-                    Name_find(newpath, name,select);
+                    Name_find(newpath, name, select);
                 else
-                    Name_check(newpath, direntp->d_name, name, select,&info);
+                    Name_check(newpath, f_name, name, select, &info);
             }
         }
         closedir(dir_ptr);
     }
 }
 
-void Name_check(char *filepath, char *filename, char *name, int select,struct stat *info)
+// filename 받아와서 filename 으로 결정
+void Name_check(char *filepath, char filename[], char *name, int select,struct stat *info)
 {
     char newfilepath[256];
+    char *newfilename;
     if (name != NULL)
     {
         if (strstr(filename, name) != NULL)
@@ -144,26 +145,52 @@ void Name_check(char *filepath, char *filename, char *name, int select,struct st
             if(select){
                 if(Discriminate_name(filename, name)){
                     Node *newnode = (Node *)malloc(sizeof(Node));
+                    memset(newnode, 0, sizeof(newnode));
+
                     /* File Path Take */
                     strcpy(newfilepath, filepath);
+
                     /* Put in data to use list */
                     strcpy(newnode->filepath, newfilepath);
-                    newnode->filename = cutting_filename(newfilepath);
+                    
+                    newfilename = cutting_filename(newfilepath);          
+                    // if(newfilename == NULL){
+                    //     newnode->filename = "UNKNOWN";
+                    // }else{
+                    //     newnode->filename = newfilename;
+                    // }
+
+                    strcpy(newnode->filename, filename);
+
                     newnode->atime = info->st_atime;
                     fflush(stdout);
+
                     /* Put in list */
                     Link_Arr[idx++] = newnode;
                 }
             }else{
                 if(Discriminate_ext(filename, name)){
                     Node *newnode = (Node *)malloc(sizeof(Node));
+                    memset(newnode, 0, sizeof(newnode));
+
                     /* File Path Take */
                     strcpy(newfilepath, filepath);
+
                     /* Put in data to use list */
                     strcpy(newnode->filepath, newfilepath);
-                    newnode->filename = cutting_filename(newfilepath);
+                    
+                    newfilename = cutting_filename(newfilepath);          
+                    // if(newfilename == NULL){
+                    //     newnode->filename = "UNKNOWN";
+                    // }else{
+                    //     newnode->filename = newfilename;5
+                    // }
+
+                    strcpy(newnode->filename, filename);
+
                     newnode->atime = info->st_atime;
                     fflush(stdout);
+                    
                     /* Put in list */
                     Link_Arr[idx++] = newnode;
                 }
@@ -178,6 +205,7 @@ void *Selecting_time_distance(void *args)
     MultipleArg *multiple_arg = (MultipleArg *)args;
 
     memset(&idx, 0, sizeof(int));
+
     /* Variable */
     DIR *dir_ptr;
     struct stat info;
@@ -221,6 +249,7 @@ void *Selecting_time_distance(void *args)
                 strcpy(newpath, path);
                 strcat(newpath, slash);
                 strcat(newpath, direntp->d_name);
+                
                 /* If File is directory, get Inside and search ( Recursive ) */
                 if (!Directory_check(&info))
                     Atime_find(newpath, st, ed);
@@ -298,10 +327,11 @@ void Atime_check(char *filepath, int st, int ed, struct stat *info)
 
         /* Put in data to use list */
         strcpy(newnode->filepath, newfilepath);
-        newnode->filename = cutting_filename(newfilepath);
+        strcpy(newnode->filename ,cutting_filename(newfilepath));
         newnode->atime = info->st_atime;
 
         fflush(stdout);
+
         /* Put in list */
         Link_Arr[idx++] = newnode;
     }
@@ -347,7 +377,7 @@ int filecopy(const char *src, const char *dst){
         return 2;
     if( (fdst = fopen(dst,"wb")) == NULL)
         return 3;
-    while((n_size = fread(buf, 1, sizeof(buf),fsrc)) > 0){
+    while((n_size = fread(buf, 1, sizeof(buf), fsrc)) > 0){
         if( fwrite(buf, 1, n_size, fdst) == 0){
             fclose(fsrc);
             fclose(fdst);
@@ -365,12 +395,22 @@ void moving(int* arr, int num){
     int i = 0;
     char* name;
     char path[BUFSIZE];
+    char file_path[BUFSIZE];
+    memset(path, 0, sizeof(path));
+    memset(file_path, 0, sizeof(file_path));
+
     while(i< num){
-        name = cutting_filename(Link_Arr[arr[i]]->filepath);
+        strcpy(file_path, Link_Arr[arr[i]]->filepath);
+        name = Link_Arr[arr[i++]]->filename;
+        
         strcpy(path, MOVE_FILE_PATH);
         strcat(path, slash);
         strcat(path, name);
-        rename(Link_Arr[arr[i++]]->filepath, path);
+
+        if(rename(file_path, path)){
+            perror("rename: ");
+            exit(1);
+        }
     }
 }
 
@@ -381,7 +421,7 @@ void back_up(int* arr, int num){
         /* Back up file path setting */
         strcpy(BACK_UP, BACK_UP_PATH);
         strcat(BACK_UP, slash);
-        strcat(BACK_UP, cutting_filename(Link_Arr[arr[i]]->filepath));
+        strcat(BACK_UP, Link_Arr[arr[i]]->filename);
 
         /* File Copy */
         switch(filecopy(Link_Arr[arr[i++]]->filepath, BACK_UP)){
@@ -415,18 +455,19 @@ char* cutting_filename(char* filepath){
 
 bool Discriminate_name(char filepath[], char* name){
     char copypath[BUFSIZE];
-    char* token;
-    char* prev;
+    char* token = NULL;
+    char* prev = NULL;
+
     strcpy(copypath, filepath);
 
     token = strtok(copypath, "/");
+    
     while(token != NULL){
         prev = token;
         token = strtok(NULL,"/");
     }
-    if(prev != NULL && !strcmp(prev, name)){
+    if(prev != NULL && !strcmp(prev, name))
         return true;
-    }
     return false;
 }
 
@@ -434,15 +475,15 @@ bool Discriminate_ext(char filepath[], char* ext){
     char copypath[BUFSIZE];
     char* token;
     char* prev;
+    
     strcpy(copypath, filepath);
-        
+    
     token = strtok(copypath, ".");
     while(token != NULL){
         prev = token;
         token = strtok(NULL,".");
     }
-    if(prev != NULL && !strcmp(prev, ext)){
+    if(prev != NULL && !strcmp(prev, ext))
         return true;
-    }
     return false;
 }
