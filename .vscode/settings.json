@@ -14,6 +14,7 @@
     "unistd.h": "c",
     "string.h": "c",
     "pwd.h": "c",
-    "types.h": "c"
+    "types.h": "c",
+    "typeinfo": "c"
   }
 }

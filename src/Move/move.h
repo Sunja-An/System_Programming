@@ -14,12 +14,11 @@
 #include <grp.h>
 #include <pthread.h>
 #include <ncurses.h>
-#include <ncurses.h>
 
 /* ls command and find the files according to conditions */
 void *Selecting_Filename(void *args);
-void Name_find(char *dirpath, char *name);
-void Name_check(char *filepath, char *filename, char *name, struct stat *info);
+void Name_find(char *dirpath, char *name, int select);
+void Name_check(char *filepath, char filename[], char *name, int select,struct stat *info);
 
 /* Time Distance Find */
 void *Selecting_time_distance(void *args);
@@ -35,14 +34,12 @@ time_t MakeLocalTime_t(int YY, int MM, int DD);
 /* Remove Dirpath first character */
 void RemoveFirst(char *buf);
 
-/* Collecting second & third */
-void *Loop_Filename(void *args);
-void *Loop_Distance(void *args);
-
 /* Selected files to move and backup */
 int filecopy(const char *src, const char *dst);
-void back_up(int* arr);
-void moving(int* arr, int size);
+void moving(int* arr, int num);
+void back_up(int* arr, int num);
 
 /* String Setting */
-char* cutting_filename(char* filename);
+char* cutting_filename(char* filepath);
+bool Discriminate_name(char filepath[], char* name);
+bool Discriminate_ext(char filepath[], char* ext);

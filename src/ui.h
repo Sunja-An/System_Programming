@@ -23,6 +23,7 @@ void copyOpt1(WINDOW *scr);
 void copyOpt2(WINDOW *scr);
 void copyOpt3(WINDOW *scr);
 void print_takeindex(WINDOW *scr);
-void con_savepath(WINDOW *scr);
+void con_movepath(WINDOW *scr);
+void con_backuppath(WINDOW *scr);
 void con_printpath(WINDOW *scr);
 void colorset(WINDOW *scr);
