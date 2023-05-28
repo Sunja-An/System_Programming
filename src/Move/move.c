@@ -154,12 +154,6 @@ void Name_check(char *filepath, char filename[], char *name, int select,struct s
                     strcpy(newnode->filepath, newfilepath);
                     
                     newfilename = cutting_filename(newfilepath);          
-                    // if(newfilename == NULL){
-                    //     newnode->filename = "UNKNOWN";
-                    // }else{
-                    //     newnode->filename = newfilename;
-                    // }
-
                     strcpy(newnode->filename, filename);
 
                     newnode->atime = info->st_atime;
@@ -180,11 +174,6 @@ void Name_check(char *filepath, char filename[], char *name, int select,struct s
                     strcpy(newnode->filepath, newfilepath);
                     
                     newfilename = cutting_filename(newfilepath);          
-                    // if(newfilename == NULL){
-                    //     newnode->filename = "UNKNOWN";
-                    // }else{
-                    //     newnode->filename = newfilename;5
-                    // }
 
                     strcpy(newnode->filename, filename);
 
@@ -213,7 +202,7 @@ void *Selecting_time_distance(void *args)
     char path[256];
     char newpath[256];
 
-    char *filename;
+    char filename[BUFSIZE];
     int st;
     int ed;
 
@@ -460,13 +449,13 @@ bool Discriminate_name(char filepath[], char* name){
 
     strcpy(copypath, filepath);
 
-    token = strtok(copypath, "/");
+    token = strtok(copypath, ".");
     
-    while(token != NULL){
-        prev = token;
-        token = strtok(NULL,"/");
-    }
-    if(prev != NULL && !strcmp(prev, name))
+    // while(token != NULL){
+    //     prev = token;
+    //     token = strtok(NULL,"/");
+    // }
+    if(token != NULL && !strcmp(token, name))
         return true;
     return false;
 }
