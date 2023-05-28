@@ -10,7 +10,7 @@
 typedef struct
 {
     char filepath[BUFSIZE]; /* Filepath Judge */
-    char *filename;
+    char filename[BUFSIZE];
     char *extension;
     time_t atime;           /* Modified Time Judge */
 } Node;
