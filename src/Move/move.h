@@ -23,7 +23,7 @@ void Name_check(char *filepath, char filename[], char *name, int select,struct s
 /* Time Distance Find */
 void *Selecting_time_distance(void *args);
 void Atime_find(char *dirpath, int st, int ed);
-void Atime_check(char *filepath, int st, int ed, struct stat *info);
+void Atime_check(char *filepath, char filename[] ,int st, int ed, struct stat *info);
 
 /* Directory File Find */
 int Directory_check(struct stat *info_p);

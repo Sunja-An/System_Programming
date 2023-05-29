@@ -76,7 +76,19 @@ int main(int argc, char *argv[])
         refresh();
     }
     endwin();
-    echo();
+
+    // int selection;
+    // while (1)
+    // {
+    //     printf("\n\n\n--------------------------------------------------------\n");
+    //     printf("Additional Select Block!\n");
+    //     printf("Select what you want? (0: QUIT 1: extension 2: Filename 3: Time Distance): ");
+    //     scanf("%d", &selection);
+    //     if (selection == 0)
+    //         break;
+    //     else
+    //         sidemenu(selection);
+    // }
 
     return 0;
 }
@@ -636,8 +648,6 @@ void con_backuppath(WINDOW *scr){
     noecho();
     wrefresh(scr);
 }
-
-
 void con_printpath(WINDOW *scr){
     int opt;
     werase(scr);
@@ -657,5 +667,30 @@ void con_printpath(WINDOW *scr){
         FILEPATH=0;
         break;
     }
+    wrefresh(scr);
+}
+void colorset(WINDOW *scr){
+    int opt;
+    char charopt[1];
+    werase(scr);
+    mvwprintw(scr, 1, 2, "Set UI color : choose the number of colorset");
+    mvwprintw(scr, 2, 2, "*********************************************************");
+    mvwprintw(scr, 3, 2, "color");
+    mvwprintw(scr, 3, 25, "background");
+    mvwprintw(scr, 3, 45, "letter");
+    mvwprintw(scr, 4, 2, " 1");
+    mvwprintw(scr, 4, 25, " blue");
+    mvwprintw(scr, 4, 45, " white");
+    mvwprintw(scr, 5, 2, " 2");
+    mvwprintw(scr, 5, 25, " white");
+    mvwprintw(scr, 5, 45, " blue");
+    mvwprintw(scr, 6, 2, " 3");
+    mvwprintw(scr, 6, 25, " grey");
+    mvwprintw(scr, 6, 45, " red");
+    mvwprintw(scr, 7, 2, "*********************************************************");
+    opt = wgetch(scr);
+    charopt[0] = (char)opt;
+    color = atoi(charopt);
+    bkgd(COLOR_PAIR(color));
     wrefresh(scr);
 }
