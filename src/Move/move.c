@@ -137,7 +137,7 @@ void Name_find(char *dirpath, char *name, int select)
 void Name_check(char *filepath, char filename[], char *name, int select,struct stat *info)
 {
     char newfilepath[256];
-    char *newfilename;
+    //char *newfilename;
     if (name != NULL)
     {
         if (strstr(filename, name) != NULL)
@@ -153,7 +153,7 @@ void Name_check(char *filepath, char filename[], char *name, int select,struct s
                     /* Put in data to use list */
                     strcpy(newnode->filepath, newfilepath);
                     
-                    newfilename = cutting_filename(newfilepath);          
+                    //newfilename = cutting_filename(newfilepath);          
                     strcpy(newnode->filename, filename);
 
                     newnode->atime = info->st_atime;
@@ -173,7 +173,7 @@ void Name_check(char *filepath, char filename[], char *name, int select,struct s
                     /* Put in data to use list */
                     strcpy(newnode->filepath, newfilepath);
                     
-                    newfilename = cutting_filename(newfilepath);          
+                    //newfilename = cutting_filename(newfilepath);          
 
                     strcpy(newnode->filename, filename);
 
@@ -241,10 +241,10 @@ void *Selecting_time_distance(void *args)
                 
                 /* If File is directory, get Inside and search ( Recursive ) */
                 if (!Directory_check(&info))
-                    Atime_find(newpath, st, ed);
+                    Atime_find(newpath,st, ed);
                 /* If not directory, checking Extension */
                 else
-                    Atime_check(newpath, st, ed, &info);
+                    Atime_check(newpath, direntp->d_name,st, ed, &info);
             }
         }
         closedir(dir_ptr);
@@ -296,15 +296,14 @@ void Atime_find(char *dirpath, int st, int ed)
                 if (!Directory_check(&info))
                     Atime_find(newpath, st, ed);
                 else
-                    Atime_check(newpath, st, ed, &info);
+                    Atime_check(newpath, direntp->d_name ,st, ed, &info);
             }
         }
         closedir(dir_ptr);
     }
 }
 
-void Atime_check(char *filepath, int st, int ed, struct stat *info)
-{
+void Atime_check(char *filepath, char filename[] ,int st, int ed, struct stat *info){
     char ptr[BUFSIZE];
     char newfilepath[256];
     if (st <= info->st_atime && ed >= info->st_atime)
@@ -316,7 +315,7 @@ void Atime_check(char *filepath, int st, int ed, struct stat *info)
 
         /* Put in data to use list */
         strcpy(newnode->filepath, newfilepath);
-        strcpy(newnode->filename ,cutting_filename(newfilepath));
+        strcpy(newnode->filename , filename);
         newnode->atime = info->st_atime;
 
         fflush(stdout);
@@ -336,16 +335,18 @@ int Directory_check(struct stat *info_p)
 
 time_t MakeLocalTime_t(int YY, int MM, int DD)
 {
-    struct tm st_tm;
+    struct tm* st_tm;
+    time_t rawtime;
+    time(&rawtime);
+    st_tm = localtime(&rawtime);
+    st_tm->tm_year = YY - 1900;
+    st_tm->tm_mon = MM - 1;
+    st_tm->tm_mday = DD;
+    st_tm->tm_hour = 0; // default value
+    st_tm->tm_min = 0;  // default value
+    st_tm->tm_sec = 0;  // default value
 
-    st_tm.tm_year = YY - 1900;
-    st_tm.tm_mon = MM - 1;
-    st_tm.tm_mday = DD;
-    st_tm.tm_hour = 0; // default value
-    st_tm.tm_min = 0;  // default value
-    st_tm.tm_sec = 0;  // default value
-
-    return mktime(&st_tm);
+    return mktime(st_tm);
 }
 
 void RemoveFirst(char *buf)
