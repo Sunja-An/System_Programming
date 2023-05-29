@@ -37,7 +37,7 @@ We want to consumer that using this program feel comfortable.
 
 For building and running the application you need:
 
-- Ubuntu 18.04.LTS
+- Ubuntu 18.04.LTS +
 - lpthread Package
 - lncurses Package
 
@@ -95,6 +95,10 @@ For building and running the application you need:
 
 **옵션을 통해 원하는 디렉토리에 원하는 파일들 추가 가능**
 * CONFIG 옵션란을 통해서 원하는 파일 위치를 입력할 수 있다.
+
+### 주의사항
+**Terminal 의 크기를 충분히 넓혀주세요!**
+* 화면이 안뜨는 Error 가 발생할 수 있습니다.
 
 
 
