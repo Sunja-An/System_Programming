@@ -43,3 +43,5 @@ void back_up(int* arr, int num);
 char* cutting_filename(char* filepath);
 bool Discriminate_name(char filepath[], char* name);
 bool Discriminate_ext(char filepath[], char* ext);
+
+void arr_clear();

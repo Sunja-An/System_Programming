@@ -477,3 +477,9 @@ bool Discriminate_ext(char filepath[], char* ext){
         return true;
     return false;
 }
+
+void arr_clear(){
+    for(int i = 0;i<idx;i++){
+        free(Link_Arr[i]);
+    }
+}

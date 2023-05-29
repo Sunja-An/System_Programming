@@ -5,9 +5,11 @@
 
 extern Node *Link_Arr[BUFSIZE]; /* Saving Node* variable to link*/
 extern int idx;                 /* Link Arr Index */
+
 char CONFIG_FILE;
 char CACHE_FILE;
 char FILEPATH = 0;
+char mc=0;
 
 extern char MOVE_FILE_PATH[BUFSIZE];
 extern char BACK_UP_PATH[BUFSIZE];
@@ -36,7 +38,7 @@ int main(int argc, char *argv[])
     {
         WINDOW **menuItems;
         int selectedItem;
-
+        arr_clear();
         key = getch();
         wrefresh(exeScreen);
         
@@ -48,10 +50,14 @@ int main(int argc, char *argv[])
             switch (selectedItem)
             {
             case 0:
+                mc = 0;
                 moveMode(exeScreen);
+            
                 break;
             case 1:
+                mc = 1;
                 copyMode(exeScreen);
+
                 break;
             case 2:
                 title(exeScreen);
@@ -573,6 +579,15 @@ void print_takeindex(WINDOW *scr){
     int j = 0;
     char tmp[BUFSIZE], *tok;
     int* input = (int*)malloc(4*BUFSIZE);
+    int opt;
+    if(idx == 0) {
+        werase(scr);
+        mvwprintw(scr, 1, 2, "there is no file to choose");
+        mvwprintw(scr, 2, 2, "press any key to return main menu");
+        opt = wgetch(scr);
+        wrefresh(scr);
+        return;
+    }
     for (int i = 0; i <= pages; i++)
     {
         Print_Success(scr, i);
@@ -587,8 +602,8 @@ void print_takeindex(WINDOW *scr){
             j++;
         }
     }
-    noecho();
-    int deletepages=j/20, opt;
+
+    int deletepages=j/20;
     for (int i = 0; i <= deletepages; i++)
     {
         Print_Delete(scr, i, j, input);
@@ -596,11 +611,11 @@ void print_takeindex(WINDOW *scr){
         opt = wgetch(scr);
     }
     
-    moving(input, j+1); 
-    /*switch(mc){
+    noecho();
+    switch(mc){
         case 0: moving(input, j+1); 
-        case 1: filecopy(input, j+1); 
-    }*/
+        case 1: back_up(input, j+1); 
+    }
     
     free(input);
 }
@@ -612,7 +627,7 @@ void con_movepath(WINDOW *scr){
     mvwprintw(scr, 1, 2, " Set save filepath : input where to save");
     mvwprintw(scr, 2, 2, " please type absolute path");
     mvwprintw(scr, 3, 2, " ex) /home/usrname/WorkSpace/fileBackup");
-    mvwprintw(scr, 4, 2, " default save location) /tmp/FTM_MOVE");
+    mvwprintw(scr, 4, 2, " now) %s", MOVE_FILE_PATH);
     mvwprintw(scr, 5, 2, "*************************************************");
     mvwprintw(scr, 8, 2, "*************************************************");
     mvwprintw(scr, 6, 2, "Move file path(absolute) : ");
@@ -628,7 +643,7 @@ void con_backuppath(WINDOW *scr){
     mvwprintw(scr, 1, 2, " Set save filepath : input where to save");
     mvwprintw(scr, 2, 2, " please type absolute path");
     mvwprintw(scr, 3, 2, " ex) /home/usrname/WorkSpace/fileBackup");
-    mvwprintw(scr, 4, 2, " default save location) /tmp/FTM_BACK_UP");
+    mvwprintw(scr, 4, 2, " now) %s", BACK_UP_PATH);
     mvwprintw(scr, 5, 2, "*************************************************");
     mvwprintw(scr, 8, 2, "*************************************************");
     mvwprintw(scr, 6, 2, "Backup file path(absolute) : ");
