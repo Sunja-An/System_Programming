@@ -579,6 +579,7 @@ void print_takeindex(WINDOW *scr){
     int j = 0;
     char tmp[BUFSIZE], *tok;
     int* input = (int*)malloc(4*BUFSIZE);
+    input[0]=-1;
     int opt;
     if(idx == 0) {
         werase(scr);
@@ -602,7 +603,14 @@ void print_takeindex(WINDOW *scr){
             j++;
         }
     }
-
+    if(input[0]==-1) {
+        werase(scr);
+        mvwprintw(scr, 1, 2, "User do not choose any index numbers");
+        mvwprintw(scr, 2, 2, "press any key to return main menu");
+        opt = wgetch(scr);
+        wrefresh(scr);
+        return;
+    }
     int deletepages=j/20;
     for (int i = 0; i <= deletepages; i++)
     {
