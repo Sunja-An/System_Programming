@@ -49,7 +49,7 @@ void *Selecting_Filename(void *args)
             CONFIG_FILE = ON;
     }
 
-    // fprintf(stderr, "Selecting_Filename() : cannot open %s\n", path);
+    // fprintf(stderr, "Selecting_Filename() : cannot open%s\n", path);
     else
     {
         while ((direntp = readdir(dir_ptr)) != NULL)
@@ -390,6 +390,7 @@ void moving(int* arr, int num){
     memset(file_path, 0, sizeof(file_path));
 
     while(i< num){
+        if(arr[i] == -1) break;
         strcpy(file_path, Link_Arr[arr[i]]->filepath);
         name = Link_Arr[arr[i++]]->filename;
         
@@ -408,24 +409,13 @@ void back_up(int* arr, int num){
     int i = 0;
     char BACK_UP[BUFSIZE];
     while(i<num){
+        if(arr[i] == -1) break;
         /* Back up file path setting */
         strcpy(BACK_UP, BACK_UP_PATH);
         strcat(BACK_UP, slash);
         strcat(BACK_UP, Link_Arr[arr[i]]->filename);
+        filecopy(Link_Arr[arr[i++]]->filepath, BACK_UP);
 
-        /* File Copy */
-        switch(filecopy(Link_Arr[arr[i++]]->filepath, BACK_UP)){
-        case 1:
-            printf("대상 파일의 이름이 원본과 같음.\n");
-        case 2:
-            printf("원본 파일 읽기 에러\n");
-        case 3:
-            printf("사본 파일 생성 에러\n");
-        case 4:
-            printf("사본 파일 쓰기 에러\n");
-        default:
-            printf("복사 완료.\n");
-        }
     }
 }
 
@@ -456,7 +446,7 @@ bool Discriminate_name(char filepath[], char* name){
     //     prev = token;
     //     token = strtok(NULL,"/");
     // }
-    if(token != NULL && !strcmp(token, name))
+    if(token != NULL && strstr(token, name) != NULL)
         return true;
     return false;
 }

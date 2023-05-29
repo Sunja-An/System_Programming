@@ -44,8 +44,7 @@ void Print_Delete(WINDOW *scr, int page, int n, int* input)
     mvwprintw(scr, 2, 2, "[Page %d/%d]%s\n", page+1, (n/20)+1, CUT);
     for (int i = 0; i < 20; i++)
     {
-        if (input[i+page*20] == 0 && zero !=0) break;
-        if (input[i+page*20] == 0) zero++;
+        if (input[i+page*20] == -1) break;
         
         if (FILEPATH)
             mvwprintw(scr, i+3, 2, "%d %s", i+1, Link_Arr[input[i+page*20]]->filepath); 
