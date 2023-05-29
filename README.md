@@ -24,7 +24,7 @@ We think that Window OS has file finder, then why linux have file finder?
 that was our first think before attach an idea.
 
 
-We want to consumer that using this program feel 편리함과 간편함을 느꼈으면 좋겠다.
+We want to consumer that using this program feel comfortable.
 
 
 1. You can move files according to option you selected.
