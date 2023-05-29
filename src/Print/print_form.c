@@ -22,7 +22,7 @@ void Print_Success(WINDOW *scr, int page)
     for (int i = 0; i < 20; i++)
     {
         if (Link_Arr[i+page*20] == NULL)
-            continue;
+            break;
         if (FILEPATH)
             mvwprintw(scr, i+3, 2, "%d %s", i+1, Link_Arr[i+page*20]->filepath);
         else

@@ -247,7 +247,7 @@ void title(WINDOW *scr)
 {
     werase(scr);
     mvwprintw(scr, 1, 2, "----------------------------------");
-    mvwprintw(scr, 2, 2, "-          File Manager          -");
+    mvwprintw(scr, 2, 2, "-       File Total Manager       -");
     mvwprintw(scr, 3, 2, "----------------------------------");
     mvwprintw(scr, 4, 2, "-  Press the button              -");
     mvwprintw(scr, 5, 2, "-  a : open menu, q : quit       -");
@@ -261,7 +261,7 @@ void credit(WINDOW *scr)
     mvwprintw(scr, 1, 2, "  ELEC0462-002 System Programming");
     mvwprintw(scr, 2, 2, "  2023 Spring Semester Term Project");
     mvwprintw(scr, 3, 2, "**************************************");
-    mvwprintw(scr, 4, 2, "  Team 6 : File manager");
+    mvwprintw(scr, 4, 2, "  Team 6 : File total manager");
     mvwprintw(scr, 5, 2, "**************************************");
     mvwprintw(scr, 6, 2, "           Members of Team 6        ");
     mvwprintw(scr, 7, 2, "      ID          Name        Major");
@@ -315,7 +315,7 @@ void moveOpt1(WINDOW *scr)
     void *thr_ret;
     echo();
     werase(scr);
-    mvwprintw(scr, 1, 2, "Option 1 : extension Collection");
+    mvwprintw(scr, 1, 2, "Option 1 : Extension Collection");
     mvwprintw(scr, 2, 2, "----------------------------------------------------------------");
     mvwprintw(scr, 3, 2, " String that name include (for instance : .c, .java)");
     mvwprintw(scr, 4, 2, " String : ");
@@ -355,7 +355,7 @@ void moveOpt2(WINDOW *scr)
     void *thr_ret;
     echo();
     werase(scr);
-    mvwprintw(scr, 1, 2, "Option 2 : name Collection");
+    mvwprintw(scr, 1, 2, "Option 2 : Name Collection");
     mvwprintw(scr, 2, 2, "----------------------------------------------------------------");
     mvwprintw(scr, 3, 2, " String that name include ");
     mvwprintw(scr, 4, 2, " String : ");
@@ -395,7 +395,7 @@ void moveOpt3(WINDOW *scr)
     void *thr_ret;
     echo();
     werase(scr);
-    mvwprintw(scr, 1, 2, "Option 3 : Date Classify");
+    mvwprintw(scr, 1, 2, "Option 3 : Date Collection");
     mvwprintw(scr, 2, 2, "----------------------------------------------------------------");
     mvwprintw(scr, 3, 2, " start time (distant past)");
     mvwprintw(scr, 4, 2, " Year : ");
@@ -449,7 +449,7 @@ void copyOpt1(WINDOW *scr)
     void *thr_ret;
     echo();
     werase(scr);
-    mvwprintw(scr, 1, 2, "Option 1 : extension Collection");
+    mvwprintw(scr, 1, 2, "Option 1 : Extension Collection");
     mvwprintw(scr, 2, 2, "----------------------------------------------------------------");
     mvwprintw(scr, 3, 2, " String that name include (for instance : .c, .java)");
     mvwprintw(scr, 4, 2, " String : ");
@@ -490,7 +490,7 @@ void copyOpt2(WINDOW *scr)
     void *thr_ret;
     echo();
     werase(scr);
-    mvwprintw(scr, 1, 2, "Option 2 : extension Collection");
+    mvwprintw(scr, 1, 2, "Option 2 : Name Collection");
     mvwprintw(scr, 2, 2, "----------------------------------------------------------------");
     mvwprintw(scr, 3, 2, " String that name include ");
     mvwprintw(scr, 4, 2, " String : ");
@@ -531,7 +531,7 @@ void copyOpt3(WINDOW *scr)
     void *thr_ret;
     echo();
     werase(scr);
-    mvwprintw(scr, 1, 2, "Option 3 : Date Classify");
+    mvwprintw(scr, 1, 2, "Option 3 : Date Collection");
     mvwprintw(scr, 2, 2, "----------------------------------------------------------------");
     mvwprintw(scr, 3, 2, " start time (distant past)");
     mvwprintw(scr, 4, 2, " Year : ");
