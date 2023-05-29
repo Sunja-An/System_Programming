@@ -142,16 +142,48 @@ void Name_check(char *filepath, char filename[], char *name, int select,struct s
     {
         if (strstr(filename, name) != NULL)
         {
-            Node *newnode = (Node *)malloc(sizeof(Node));
-            /* File Path Take */
-            strcpy(newfilepath, filepath);
-            /* Put in data to use list */
-            strcpy(newnode->filepath, newfilepath);
-            newnode->filename = cutting_filename(newfilepath,1);
-            newnode->atime = info->st_atime;
-            fflush(stdout);
-            /* Put in list */
-            Link_Arr[idx++] = newnode;
+            if(select){
+                if(Discriminate_name(filename, name)){
+                    Node *newnode = (Node *)malloc(sizeof(Node));
+                    memset(newnode, 0, sizeof(newnode));
+
+                    /* File Path Take */
+                    strcpy(newfilepath, filepath);
+
+                    /* Put in data to use list */
+                    strcpy(newnode->filepath, newfilepath);
+                    
+                    //newfilename = cutting_filename(newfilepath);          
+                    strcpy(newnode->filename, filename);
+
+                    newnode->atime = info->st_atime;
+                    fflush(stdout);
+
+                    /* Put in list */
+                    Link_Arr[idx++] = newnode;
+                }
+            }else{
+                if(Discriminate_ext(filename, name)){
+                    Node *newnode = (Node *)malloc(sizeof(Node));
+                    memset(newnode, 0, sizeof(newnode));
+
+                    /* File Path Take */
+                    strcpy(newfilepath, filepath);
+
+                    /* Put in data to use list */
+                    strcpy(newnode->filepath, newfilepath);
+                    
+                    //newfilename = cutting_filename(newfilepath);          
+
+                    strcpy(newnode->filename, filename);
+
+                    newnode->atime = info->st_atime;
+                    fflush(stdout);
+                    
+                    /* Put in list */
+                    Link_Arr[idx++] = newnode;
+                }
+            }
         }
     }
 }
@@ -283,6 +315,7 @@ void Atime_check(char *filepath, char filename[] ,int st, int ed, struct stat *i
 
         /* Put in data to use list */
         strcpy(newnode->filepath, newfilepath);
+        strcpy(newnode->filename , filename);
         newnode->atime = info->st_atime;
 
         fflush(stdout);
@@ -408,4 +441,39 @@ char* cutting_filename(char* filepath){
     }
     
     return prev;
+}
+
+bool Discriminate_name(char filepath[], char* name){
+    char copypath[BUFSIZE];
+    char* token = NULL;
+    char* prev = NULL;
+
+    strcpy(copypath, filepath);
+
+    token = strtok(copypath, ".");
+    
+    // while(token != NULL){
+    //     prev = token;
+    //     token = strtok(NULL,"/");
+    // }
+    if(token != NULL && !strcmp(token, name))
+        return true;
+    return false;
+}
+
+bool Discriminate_ext(char filepath[], char* ext){
+    char copypath[BUFSIZE];
+    char* token;
+    char* prev;
+    
+    strcpy(copypath, filepath);
+    
+    token = strtok(copypath, ".");
+    while(token != NULL){
+        prev = token;
+        token = strtok(NULL,".");
+    }
+    if(prev != NULL && !strcmp(prev, ext))
+        return true;
+    return false;
 }
