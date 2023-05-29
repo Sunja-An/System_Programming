@@ -257,20 +257,25 @@ void title(WINDOW *scr)
 }
 void credit(WINDOW *scr)
 {
-    werase(scr);
-    mvwprintw(scr, 1, 2, "  ELEC0462-002 System Programming");
-    mvwprintw(scr, 2, 2, "  2023 Spring Semester Term Project");
-    mvwprintw(scr, 3, 2, "**************************************");
-    mvwprintw(scr, 4, 2, "  Team 6 : File total manager");
-    mvwprintw(scr, 5, 2, "**************************************");
-    mvwprintw(scr, 6, 2, "           Members of Team 6        ");
-    mvwprintw(scr, 7, 2, "      ID          Name        Major");
-    mvwprintw(scr, 8, 2, "-------------------------------------");
-    mvwprintw(scr, 9, 2, "  2020116575   Sunwoo Ahn      CSE");
-    mvwprintw(scr, 10, 2, "  2021115360   Donghyeok Seo   CSE");
-    mvwprintw(scr, 11, 2, "**************************************");
-    mvwprintw(scr, 12, 2, "  Version : 3.0, Date : 2023-05-25");
-    mvwprintw(scr, 13, 2, "**************************************");
+    while(1){
+        werase(scr);
+        mvwprintw(scr, 1, 2, "  ELEC0462-002 System Programming");
+        mvwprintw(scr, 2, 2, "  2023 Spring Semester Term Project");
+        mvwprintw(scr, 3, 2, "**************************************");
+        mvwprintw(scr, 4, 2, "  Team 6 : File total manager");
+        mvwprintw(scr, 5, 2, "**************************************");
+        mvwprintw(scr, 6, 2, "           Members of Team 6        ");
+        mvwprintw(scr, 7, 2, "      ID          Name        Major");
+        mvwprintw(scr, 8, 2, "-------------------------------------");
+        mvwprintw(scr, 9, 2, "  2020116575   Sunwoo Ahn      CSE");
+        mvwprintw(scr, 10, 2, "  2021115360   Donghyeok Seo   CSE");
+        mvwprintw(scr, 11, 2, "**************************************");
+        mvwprintw(scr, 12, 2, "  Version : final, Date : 2023-05-29");
+        mvwprintw(scr, 13, 2, "**************************************");
+        mvwprintw(scr, 14, 2, "press any key to return main menu");
+        wgetch(scr);
+        return;
+    }    
 }
 void config(WINDOW *scr){
     int opt;
