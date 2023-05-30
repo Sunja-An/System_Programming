@@ -584,7 +584,8 @@ void print_takeindex(WINDOW *scr){
     int j = 0;
     char tmp[BUFSIZE], *tok;
     int* input = (int*)malloc(4*BUFSIZE);
-    for(int i=0; i<idx; i++) input[i]=-1;
+    echo();
+    for(int i=0; i<idx+1; i++) input[i]=-1;
     int opt;
     if(idx == 0) {
         werase(scr);
