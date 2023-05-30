@@ -4,7 +4,8 @@
 > 팀 프로젝트
 
 
-![FTM LOGO 2](https://github.com/Sunja-An/System_Programming/assets/110546006/cbf6ef6e-8a77-4603-b8e5-26295287a3e4)
+![FTM](https://github.com/Sunja-An/System_Programming/assets/110546006/947a87cc-5d0d-4e9e-b089-3939725f2353)
+
 
 
 ### 팀 소개
